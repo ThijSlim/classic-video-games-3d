@@ -308,14 +308,18 @@ export class Mario extends GameObject {
 
     switch (this.state) {
       case MarioState.Running: {
-        const freq = this.input.run ? 14 : 10;
+        const isRunning = this.input.run;
+        const freq = isRunning ? 14 : 10;
         const t = this.animationTime * freq;
 
+        // Forward lean when running, upright when walking
+        const lean = isRunning ? 0.2 : 0;
         // Subtle running bob
         const bob = Math.sin(t * 2) * 0.04;
         this.marioGroup.children.forEach(child => {
           if (child.type === 'Group' || child.type === 'Object3D') {
             child.position.y = bob;
+            child.rotation.x = lean;
           }
         });
 
@@ -328,13 +332,15 @@ export class Mario extends GameObject {
         if (this.rightLeg) this.rightLeg.rotation.z = Math.max(0, Math.sin(t)) * 0.6;
 
         // Arm swing — upperarm-local X maps to world X (forward/backward)
-        // Arms oppose same-side legs for natural gait
-        const armSwing = Math.sin(t) * 0.7;
+        // Arms oppose same-side legs for natural gait; more pronounced when running
+        const armSwing = Math.sin(t) * (isRunning ? 1.0 : 0.7);
         if (this.leftUpperarm) this.leftUpperarm.rotation.x = -armSwing;
         if (this.rightUpperarm) this.rightUpperarm.rotation.x = armSwing;
-        // Forearm bend for natural look
-        if (this.leftForearm) this.leftForearm.rotation.x = 0.3 + Math.max(0, Math.sin(t)) * 0.3;
-        if (this.rightForearm) this.rightForearm.rotation.x = 0.3 + Math.max(0, -Math.sin(t)) * 0.3;
+        // Forearm/elbow bend — stronger pump when running
+        const elbowBase = isRunning ? 0.5 : 0.3;
+        const elbowRange = isRunning ? 0.6 : 0.3;
+        if (this.leftForearm) this.leftForearm.rotation.x = elbowBase + Math.max(0, Math.sin(t)) * elbowRange;
+        if (this.rightForearm) this.rightForearm.rotation.x = elbowBase + Math.max(0, -Math.sin(t)) * elbowRange;
         break;
       }
       case MarioState.Jumping:
