@@ -6,6 +6,7 @@
 
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
+import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js';
 import { GameEngine } from '../../engine/GameEngine';
 import { GameObject } from '../../engine/GameObject';
 import { InputManager } from '../../engine/InputManager';
@@ -38,6 +39,7 @@ export class Mario extends GameObject {
   private marioGroup!: THREE.Group;
   private groundContactCount = 0;
   private deathTimer = 0;
+  private modelLoaded = false;
 
   // Game state
   coins = 0;
@@ -48,19 +50,6 @@ export class Mario extends GameObject {
 
   // Animation
   private animationTime = 0;
-  private bodyParts: {
-    body: THREE.Mesh;
-    head: THREE.Mesh;
-    hat: THREE.Mesh;
-    leftArm: THREE.Mesh;
-    rightArm: THREE.Mesh;
-    leftLeg: THREE.Mesh;
-    rightLeg: THREE.Mesh;
-    nose: THREE.Mesh;
-    mustache: THREE.Mesh;
-    leftEye: THREE.Mesh;
-    rightEye: THREE.Mesh;
-  } | null = null;
 
   constructor(engine: GameEngine, input: InputManager) {
     super(engine);
@@ -70,175 +59,6 @@ export class Mario extends GameObject {
 
   create(): void {
     this.marioGroup = new THREE.Group();
-
-    // === Build Mario character from primitives ===
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red shirt
-    const overallsMat = new THREE.MeshStandardMaterial({ color: 0x0000cc }); // Blue overalls
-    const skinMat = new THREE.MeshStandardMaterial({ color: 0xffcc99 }); // Skin
-    const hatMat = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red hat
-    const shoeMat = new THREE.MeshStandardMaterial({ color: 0x4a2800 }); // Brown shoes
-    const eyeMat = new THREE.MeshStandardMaterial({ color: 0x222222 }); // Eyes
-    const mustacheMat = new THREE.MeshStandardMaterial({ color: 0x3a1a00 }); // Mustache
-
-    // Body (torso - red shirt)
-    const body = new THREE.Mesh(
-      new THREE.BoxGeometry(0.8, 0.6, 0.5),
-      bodyMat
-    );
-    body.position.y = 0.9;
-    body.castShadow = true;
-    this.marioGroup.add(body);
-
-    // Overalls (lower torso)
-    const overalls = new THREE.Mesh(
-      new THREE.BoxGeometry(0.8, 0.4, 0.5),
-      overallsMat
-    );
-    overalls.position.y = 0.5;
-    overalls.castShadow = true;
-    this.marioGroup.add(overalls);
-
-    // Head
-    const head = new THREE.Mesh(
-      new THREE.SphereGeometry(0.35, 12, 12),
-      skinMat
-    );
-    head.position.y = 1.55;
-    head.castShadow = true;
-    this.marioGroup.add(head);
-
-    // Hat
-    const hat = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.38, 0.4, 0.15, 12),
-      hatMat
-    );
-    hat.position.y = 1.8;
-    hat.castShadow = true;
-    this.marioGroup.add(hat);
-
-    // Hat brim
-    const hatBrim = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.45, 0.45, 0.05, 12),
-      hatMat
-    );
-    hatBrim.position.set(0, 1.72, 0.1);
-    this.marioGroup.add(hatBrim);
-
-    // Nose
-    const nose = new THREE.Mesh(
-      new THREE.SphereGeometry(0.08, 8, 8),
-      skinMat
-    );
-    nose.position.set(0, 1.5, 0.35);
-    this.marioGroup.add(nose);
-
-    // Mustache
-    const mustache = new THREE.Mesh(
-      new THREE.BoxGeometry(0.25, 0.05, 0.05),
-      mustacheMat
-    );
-    mustache.position.set(0, 1.43, 0.33);
-    this.marioGroup.add(mustache);
-
-    // Eyes
-    const leftEye = new THREE.Mesh(
-      new THREE.SphereGeometry(0.05, 8, 8),
-      eyeMat
-    );
-    leftEye.position.set(-0.12, 1.58, 0.3);
-    this.marioGroup.add(leftEye);
-
-    const rightEye = new THREE.Mesh(
-      new THREE.SphereGeometry(0.05, 8, 8),
-      eyeMat
-    );
-    rightEye.position.set(0.12, 1.58, 0.3);
-    this.marioGroup.add(rightEye);
-
-    // Left Arm
-    const leftArm = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8),
-      bodyMat
-    );
-    leftArm.position.set(-0.55, 0.85, 0);
-    leftArm.rotation.z = 0.3;
-    leftArm.castShadow = true;
-    this.marioGroup.add(leftArm);
-
-    // Left Hand
-    const leftHand = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 8, 8),
-      skinMat
-    );
-    leftHand.position.set(-0.7, 0.6, 0);
-    this.marioGroup.add(leftHand);
-
-    // Right Arm
-    const rightArm = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8),
-      bodyMat
-    );
-    rightArm.position.set(0.55, 0.85, 0);
-    rightArm.rotation.z = -0.3;
-    rightArm.castShadow = true;
-    this.marioGroup.add(rightArm);
-
-    // Right Hand
-    const rightHand = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 8, 8),
-      skinMat
-    );
-    rightHand.position.set(0.7, 0.6, 0);
-    this.marioGroup.add(rightHand);
-
-    // Left Leg
-    const leftLeg = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.12, 0.12, 0.45, 8),
-      overallsMat
-    );
-    leftLeg.position.set(-0.2, 0.15, 0);
-    leftLeg.castShadow = true;
-    this.marioGroup.add(leftLeg);
-
-    // Left Shoe
-    const leftShoe = new THREE.Mesh(
-      new THREE.BoxGeometry(0.2, 0.1, 0.3),
-      shoeMat
-    );
-    leftShoe.position.set(-0.2, -0.05, 0.05);
-    this.marioGroup.add(leftShoe);
-
-    // Right Leg
-    const rightLeg = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.12, 0.12, 0.45, 8),
-      overallsMat
-    );
-    rightLeg.position.set(0.2, 0.15, 0);
-    rightLeg.castShadow = true;
-    this.marioGroup.add(rightLeg);
-
-    // Right Shoe
-    const rightShoe = new THREE.Mesh(
-      new THREE.BoxGeometry(0.2, 0.1, 0.3),
-      shoeMat
-    );
-    rightShoe.position.set(0.2, -0.05, 0.05);
-    this.marioGroup.add(rightShoe);
-
-    // Store references for animation
-    this.bodyParts = {
-      body,
-      head,
-      hat,
-      leftArm,
-      rightArm,
-      leftLeg,
-      rightLeg,
-      nose,
-      mustache,
-      leftEye,
-      rightEye,
-    };
 
     // Shadow beneath Mario
     const shadowGeo = new THREE.PlaneGeometry(1.2, 1.2);
@@ -256,13 +76,16 @@ export class Mario extends GameObject {
     this.mesh = this.marioGroup;
     this.engine.addToScene(this.mesh);
 
-    // Physics body - capsule-like (cylinder + 2 spheres approximated by a box)
+    // Load 3D Mario model from Collada file
+    this.loadModel();
+
+    // Physics body
     const shape = new CANNON.Box(new CANNON.Vec3(0.3, 0.5, 0.3));
     this.body = new CANNON.Body({
       mass: 1,
       shape,
       position: new CANNON.Vec3(0, 5, 0),
-      fixedRotation: true, // Don't tumble
+      fixedRotation: true,
       linearDamping: 0.1,
     });
 
@@ -270,10 +93,8 @@ export class Mario extends GameObject {
     this.body.addEventListener('collide', (event: any) => {
       const contact = event.contact;
       const normal = contact.ni;
-      // Determine correct normal direction relative to Mario
       const isBodyA = contact.bi === this.body;
       const upDot = isBodyA ? -normal.y : normal.y;
-      // If collision normal points upward relative to Mario, we're on ground
       if (upDot > 0.5) {
         this.groundContactCount++;
         this.isGrounded = true;
@@ -283,6 +104,34 @@ export class Mario extends GameObject {
     });
 
     this.engine.addPhysicsBody(this.body);
+  }
+
+  private loadModel(): void {
+    const loader = new ColladaLoader();
+    loader.load('/assets/mario/mario.dae', (collada) => {
+      const model = collada.scene;
+
+      // Model is ~90 units tall in native coords; scale to ~1.8 game units
+      const s = 0.02;
+      model.scale.set(s, s, s);
+      model.position.y = 0;
+
+      // Enable shadows on all meshes and upgrade to standard materials
+      model.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+        }
+      });
+
+      // Wrap in a container so the loader's Z_UP rotation on the model
+      // is not overwritten by animation code on the container
+      const container = new THREE.Group();
+      container.add(model);
+      this.marioGroup.add(container);
+      this.modelLoaded = true;
+    });
   }
 
   update(deltaTime: number): void {
@@ -428,44 +277,37 @@ export class Mario extends GameObject {
   }
 
   private animate(_deltaTime: number): void {
-    if (!this.bodyParts) return;
-
-    const { leftArm, rightArm, leftLeg, rightLeg } = this.bodyParts;
+    // Model-based animation - simple bob/tilt based on state
+    if (!this.modelLoaded) return;
 
     switch (this.state) {
       case MarioState.Running: {
-        const swingSpeed = this.input.run ? 12 : 8;
-        const swing = Math.sin(this.animationTime * swingSpeed) * 0.8;
-        leftArm.rotation.x = swing;
-        rightArm.rotation.x = -swing;
-        leftLeg.rotation.x = -swing * 0.6;
-        rightLeg.rotation.x = swing * 0.6;
-        break;
-      }
-      case MarioState.Jumping:
-      case MarioState.DoubleJump:
-      case MarioState.TripleJump: {
-        leftArm.rotation.x = -0.5;
-        rightArm.rotation.x = -0.5;
-        leftLeg.rotation.x = 0.3;
-        rightLeg.rotation.x = 0.3;
+        // Subtle running bob
+        const bob = Math.sin(this.animationTime * (this.input.run ? 12 : 8)) * 0.05;
+        this.marioGroup.children.forEach(child => {
+          if (child.type === 'Group' || child.type === 'Object3D') {
+            child.position.y = bob;
+          }
+        });
         break;
       }
       case MarioState.GroundPound: {
-        leftArm.rotation.x = Math.PI;
-        rightArm.rotation.x = Math.PI;
-        leftLeg.rotation.x = -0.5;
-        rightLeg.rotation.x = -0.5;
+        // Tuck pose
+        this.marioGroup.children.forEach(child => {
+          if (child.type === 'Group' || child.type === 'Object3D') {
+            child.rotation.x = 0.3;
+          }
+        });
         break;
       }
-      case MarioState.Idle:
       default: {
-        // Subtle idle animation
-        const breathe = Math.sin(this.animationTime * 2) * 0.05;
-        leftArm.rotation.x = breathe;
-        rightArm.rotation.x = breathe;
-        leftLeg.rotation.x = 0;
-        rightLeg.rotation.x = 0;
+        // Reset
+        this.marioGroup.children.forEach(child => {
+          if (child.type === 'Group' || child.type === 'Object3D') {
+            child.position.y = 0;
+            child.rotation.x = 0;
+          }
+        });
         break;
       }
     }
