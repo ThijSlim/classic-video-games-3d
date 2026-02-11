@@ -41,6 +41,16 @@ export class Mario extends GameObject {
   private deathTimer = 0;
   private modelLoaded = false;
 
+  // Bone references for animation
+  private leftThigh: THREE.Bone | null = null;
+  private rightThigh: THREE.Bone | null = null;
+  private leftLeg: THREE.Bone | null = null;
+  private rightLeg: THREE.Bone | null = null;
+  private leftUpperarm: THREE.Bone | null = null;
+  private rightUpperarm: THREE.Bone | null = null;
+  private leftForearm: THREE.Bone | null = null;
+  private rightForearm: THREE.Bone | null = null;
+
   // Game state
   coins = 0;
   stars = 0;
@@ -122,6 +132,22 @@ export class Mario extends GameObject {
           const mesh = child as THREE.Mesh;
           mesh.castShadow = true;
           mesh.receiveShadow = true;
+        }
+      });
+
+      // Find bones for procedural animation
+      model.traverse((node) => {
+        if ((node as THREE.Bone).isBone) {
+          switch (node.name) {
+            case 'left_thigh': this.leftThigh = node as THREE.Bone; break;
+            case 'right_thigh': this.rightThigh = node as THREE.Bone; break;
+            case 'left_leg': this.leftLeg = node as THREE.Bone; break;
+            case 'right_leg': this.rightLeg = node as THREE.Bone; break;
+            case 'left_upperarm': this.leftUpperarm = node as THREE.Bone; break;
+            case 'right_upperarm': this.rightUpperarm = node as THREE.Bone; break;
+            case 'left_forearm': this.leftForearm = node as THREE.Bone; break;
+            case 'right_forearm': this.rightForearm = node as THREE.Bone; break;
+          }
         }
       });
 
@@ -282,35 +308,101 @@ export class Mario extends GameObject {
 
     switch (this.state) {
       case MarioState.Running: {
+        const freq = this.input.run ? 14 : 10;
+        const t = this.animationTime * freq;
+
         // Subtle running bob
-        const bob = Math.sin(this.animationTime * (this.input.run ? 12 : 8)) * 0.05;
+        const bob = Math.sin(t * 2) * 0.04;
         this.marioGroup.children.forEach(child => {
           if (child.type === 'Group' || child.type === 'Object3D') {
             child.position.y = bob;
           }
         });
+
+        // Leg swing — thigh-local Z maps to world X (forward/backward axis)
+        const legSwing = Math.sin(t) * 0.8;
+        if (this.leftThigh) this.leftThigh.rotation.z = legSwing;
+        if (this.rightThigh) this.rightThigh.rotation.z = -legSwing;
+        // Knee bend — only bends when leg is behind
+        if (this.leftLeg) this.leftLeg.rotation.z = Math.max(0, -Math.sin(t)) * 0.6;
+        if (this.rightLeg) this.rightLeg.rotation.z = Math.max(0, Math.sin(t)) * 0.6;
+
+        // Arm swing — upperarm-local X maps to world X (forward/backward)
+        // Arms oppose same-side legs for natural gait
+        const armSwing = Math.sin(t) * 0.7;
+        if (this.leftUpperarm) this.leftUpperarm.rotation.x = -armSwing;
+        if (this.rightUpperarm) this.rightUpperarm.rotation.x = armSwing;
+        // Forearm bend for natural look
+        if (this.leftForearm) this.leftForearm.rotation.x = 0.3 + Math.max(0, Math.sin(t)) * 0.3;
+        if (this.rightForearm) this.rightForearm.rotation.x = 0.3 + Math.max(0, -Math.sin(t)) * 0.3;
+        break;
+      }
+      case MarioState.Jumping:
+      case MarioState.DoubleJump:
+      case MarioState.TripleJump: {
+        // Arms raised, legs slightly tucked
+        if (this.leftUpperarm) this.leftUpperarm.rotation.x = -0.8;
+        if (this.rightUpperarm) this.rightUpperarm.rotation.x = -0.8;
+        if (this.leftForearm) this.leftForearm.rotation.x = 0.4;
+        if (this.rightForearm) this.rightForearm.rotation.x = 0.4;
+        if (this.leftThigh) { this.leftThigh.rotation.z = 0.3; this.leftThigh.rotation.x = 0; }
+        if (this.rightThigh) { this.rightThigh.rotation.z = 0.3; this.rightThigh.rotation.x = 0; }
+        if (this.leftLeg) this.leftLeg.rotation.z = 0;
+        if (this.rightLeg) this.rightLeg.rotation.z = 0;
+        break;
+      }
+      case MarioState.Falling: {
+        // Arms out, legs dangling
+        if (this.leftUpperarm) this.leftUpperarm.rotation.x = -0.3;
+        if (this.rightUpperarm) this.rightUpperarm.rotation.x = -0.3;
+        if (this.leftForearm) this.leftForearm.rotation.x = 0.2;
+        if (this.rightForearm) this.rightForearm.rotation.x = 0.2;
+        if (this.leftThigh) { this.leftThigh.rotation.z = 0.15; this.leftThigh.rotation.x = 0; }
+        if (this.rightThigh) { this.rightThigh.rotation.z = 0.15; this.rightThigh.rotation.x = 0; }
+        if (this.leftLeg) this.leftLeg.rotation.z = 0.2;
+        if (this.rightLeg) this.rightLeg.rotation.z = 0.2;
         break;
       }
       case MarioState.GroundPound: {
-        // Tuck pose
+        // Tuck pose - knees up, arms in
         this.marioGroup.children.forEach(child => {
           if (child.type === 'Group' || child.type === 'Object3D') {
             child.rotation.x = 0.3;
           }
         });
+        if (this.leftThigh) { this.leftThigh.rotation.z = -0.8; this.leftThigh.rotation.x = 0; }
+        if (this.rightThigh) { this.rightThigh.rotation.z = -0.8; this.rightThigh.rotation.x = 0; }
+        if (this.leftLeg) this.leftLeg.rotation.z = 0.6;
+        if (this.rightLeg) this.rightLeg.rotation.z = 0.6;
+        if (this.leftUpperarm) this.leftUpperarm.rotation.x = 0.4;
+        if (this.rightUpperarm) this.rightUpperarm.rotation.x = 0.4;
+        if (this.leftForearm) this.leftForearm.rotation.x = 0;
+        if (this.rightForearm) this.rightForearm.rotation.x = 0;
         break;
       }
       default: {
-        // Reset
+        // Idle - reset all bones and container
         this.marioGroup.children.forEach(child => {
           if (child.type === 'Group' || child.type === 'Object3D') {
             child.position.y = 0;
             child.rotation.x = 0;
           }
         });
+        this.resetBones();
         break;
       }
     }
+  }
+
+  private resetBones(): void {
+    if (this.leftThigh) { this.leftThigh.rotation.x = 0; this.leftThigh.rotation.z = 0; }
+    if (this.rightThigh) { this.rightThigh.rotation.x = 0; this.rightThigh.rotation.z = 0; }
+    if (this.leftLeg) { this.leftLeg.rotation.x = 0; this.leftLeg.rotation.z = 0; }
+    if (this.rightLeg) { this.rightLeg.rotation.x = 0; this.rightLeg.rotation.z = 0; }
+    if (this.leftUpperarm) this.leftUpperarm.rotation.x = 0;
+    if (this.rightUpperarm) this.rightUpperarm.rotation.x = 0;
+    if (this.leftForearm) this.leftForearm.rotation.x = 0;
+    if (this.rightForearm) this.rightForearm.rotation.x = 0;
   }
 
   collectCoin(): void {
