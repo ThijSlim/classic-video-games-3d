@@ -10,10 +10,14 @@ import { GameObject } from '../engine/GameObject';
 import { Platform } from './objects/Platform';
 import { Coin } from './objects/Coin';
 import { Goomba } from './objects/Goomba';
+import { Mario } from './objects/Mario';
 
 export class World {
   private engine: GameEngine;
   private entities: GameObject[] = [];
+  private mario: Mario | null = null;
+  private coins: Coin[] = [];
+  private goombas: Goomba[] = [];
 
   constructor(engine: GameEngine) {
     this.engine = engine;
@@ -100,7 +104,9 @@ export class World {
     ];
 
     for (const pos of coinPositions) {
-      this.addEntity(new Coin(this.engine, pos));
+      const coin = new Coin(this.engine, pos);
+      this.coins.push(coin);
+      this.addEntity(coin);
     }
 
     // === Enemies (Goombas) ===
@@ -112,7 +118,9 @@ export class World {
     ];
 
     for (const g of goombaPositions) {
-      this.addEntity(new Goomba(this.engine, g));
+      const goomba = new Goomba(this.engine, g);
+      this.goombas.push(goomba);
+      this.addEntity(goomba);
     }
 
     // === Decorations ===
@@ -217,12 +225,57 @@ export class World {
 
   addEntity(entity: GameObject): void {
     this.entities.push(entity);
+    if (entity instanceof Mario) {
+      this.mario = entity;
+    }
   }
 
   update(deltaTime: number): void {
     for (const entity of this.entities) {
       if (entity.isActive) {
         entity.update(deltaTime);
+      }
+    }
+
+    // Check collisions
+    if (this.mario && !this.mario.isDead && !this.mario.isGameOver) {
+      this.checkCoinCollisions();
+      this.checkGoombaCollisions();
+    }
+  }
+
+  private checkCoinCollisions(): void {
+    if (!this.mario) return;
+    const marioPos = this.mario.body.position;
+    const collectRadius = 1.2;
+
+    for (const coin of this.coins) {
+      if (!coin.isActive) continue;
+      const dx = marioPos.x - coin.body.position.x;
+      const dy = marioPos.y - coin.body.position.y;
+      const dz = marioPos.z - coin.body.position.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < collectRadius) {
+        this.mario.collectCoin();
+        coin.destroy();
+      }
+    }
+  }
+
+  private checkGoombaCollisions(): void {
+    if (!this.mario) return;
+    const marioPos = this.mario.body.position;
+    const hitRadius = 1.0;
+
+    for (const goomba of this.goombas) {
+      if (!goomba.isActive) continue;
+      const dx = marioPos.x - goomba.body.position.x;
+      const dy = marioPos.y - goomba.body.position.y;
+      const dz = marioPos.z - goomba.body.position.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist < hitRadius) {
+        // Mario hit by Goomba — game over
+        this.mario.die();
       }
     }
   }

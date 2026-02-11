@@ -2,12 +2,7 @@
 name: learning
 description: Reviews completed implementations, extracts best practices and reusable patterns, and updates skills and agent configurations to improve future development cycles.
 tools: ["read", "search", "edit"]
-user-invokable: true
-handoffs:
-  - label: 🔍 Start New Feature
-    agent: feature-analyst
-    prompt: "Start analyzing a new feature request with the updated knowledge:"
-    send: false
+user-invokable: false
 ---
 
 # Learning Agent

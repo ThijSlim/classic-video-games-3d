@@ -34,6 +34,19 @@ async function main() {
   // Initialize HUD
   const hud = new HUD();
 
+  // Game over overlay
+  const gameOverEl = document.getElementById('game-over') as HTMLElement;
+  const restartBtn = document.getElementById('restart-btn') as HTMLElement;
+  let gameOverShown = false;
+
+  restartBtn.addEventListener('click', () => {
+    mario.resetGame();
+    gameOverEl.classList.remove('visible');
+    gameOverShown = false;
+    // Re-lock pointer
+    engine.renderer.domElement.requestPointerLock();
+  });
+
   // Wait a bit for visual effect
   progressFill.style.width = '100%';
   await new Promise(resolve => setTimeout(resolve, 500));
@@ -49,15 +62,22 @@ async function main() {
 
   // Game loop
   engine.onUpdate((deltaTime: number) => {
-    input.update();
     world.update(deltaTime);
     mario.update(deltaTime);
     engine.cameraController.followTarget(mario.position, mario.rotation, deltaTime);
+    input.update();
     hud.update({
       coins: mario.coins,
       stars: mario.stars,
       lives: mario.lives,
     });
+
+    // Show game-over overlay
+    if (mario.isGameOver && !gameOverShown) {
+      gameOverShown = true;
+      gameOverEl.classList.add('visible');
+      document.exitPointerLock();
+    }
   });
 
   engine.start();

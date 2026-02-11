@@ -163,3 +163,57 @@ camera.lookAt(targetPos);
 - Keep polygon counts low: 8-16 segments for cylinders/spheres
 - Reuse materials across objects when colors match
 - Use `THREE.Group` for complex objects — easier transforms and cleanup
+
+---
+
+## Techniques Added: 2026-02-11
+
+### Reliable Ground Detection (cannon-es)
+The collision normal direction depends on which body is `bi` vs `bj`. **Always** check `contact.bi === this.body` to determine the correct sign:
+```typescript
+this.body.addEventListener('collide', (event: any) => {
+  const contact = event.contact;
+  const normal = contact.ni;
+  const isBodyA = contact.bi === this.body;
+  const upDot = isBodyA ? -normal.y : normal.y;
+  if (upDot > 0.5) {
+    this.isGrounded = true;
+  }
+});
+```
+**Pitfall:** Using `event.body === this.body` or checking raw `normal.y` without body-order correction will give wrong results on platforms.
+
+**Pitfall:** Do NOT use position-based ground checks like `body.position.y < 1.5` — this breaks on elevated platforms. Use collision normals or velocity-based fallback instead.
+
+### Velocity-Based Grounded Fallback
+Complement collision-based detection with a velocity check for edge cases:
+```typescript
+// If velocity.y is near zero, body is resting on something
+if (Math.abs(this.body.velocity.y) < 0.3 && !this.isGrounded) {
+  this.isGrounded = true;
+}
+// If clearly falling, mark as not grounded
+if (this.body.velocity.y < -2) {
+  this.isGrounded = false;
+}
+```
+
+### Disabling collisionResponse for Death/Ghost
+Toggle `body.collisionResponse` at runtime to make objects pass through platforms:
+```typescript
+this.body.collisionResponse = false;  // Ghost mode — falls through everything
+this.body.collisionResponse = true;   // Restore normal collisions
+```
+Useful for death animations (body pops up then falls through floor).
+
+### Platformer Speed Constants (with gravity -25)
+Tuned values that feel right with the project's strong gravity:
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| Walk speed | 7 | Camera-relative |
+| Run speed | 12 | Hold Shift |
+| Jump force | 13 | Single jump |
+| Double jump | 15 | Within 0.4s window |
+| Triple jump | 19 | Within 0.4s window |
+| Ground pound | -20 | Instant downward velocity |
+| Death pop | 12 | Upward velocity on die |

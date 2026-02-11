@@ -2,12 +2,7 @@
 name: feature-analyst
 description: Analyzes game feature requests and produces detailed step-by-step implementation plans with requirements, dependencies, and risk assessment.
 tools: ["read", "search"]
-user-invokable: true
-handoffs:
-  - label: 🧩 Compose Game Objects
-    agent: game-composer
-    prompt: "Based on the feature analysis above, identify all required game objects — reuse existing ones and design new ones needed for implementation:"
-    send: false
+user-invokable: false
 ---
 
 # Feature Analyst
@@ -78,10 +73,13 @@ Brief description of what this feature adds to the game.
 - Visuals: Three.js primitives (no external 3D models)
 
 ### Existing Game Objects
-- **Mario** — Player character with running, jumping (triple jump), ground pound, wall slide
+- **Mario** — Player character with running, jumping (triple jump), ground pound, wall slide, death animation, game-over state
 - **Platform** — Static platforms with configurable position, size, color
 - **Coin** — Spinning collectible with glow effect and trigger physics
-- **Goomba** — Enemy that patrols in a circle, defeatable by jumping on top
+- **Goomba** — Enemy that patrols in a circle, contact triggers Mario death
 
 ### Game State
 - Coins (100 = extra life), Stars, Lives tracked on Mario and displayed via HUD
+- `isDead` / `isGameOver` flags on Mario control game flow
+- Game-over overlay in index.html, controlled from main.ts
+- World.ts handles collision detection between Mario and coins/goombas via distance checks

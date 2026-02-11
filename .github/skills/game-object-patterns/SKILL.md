@@ -40,9 +40,12 @@ export abstract class GameObject {
 - **Config:** `InputManager` (no config object — takes input directly)
 - **Visual:** Multi-part character built from boxes, cylinders, spheres (body, head, hat, arms, legs, eyes, mustache)
 - **Physics:** `CANNON.Box(0.3, 0.5, 0.3)`, mass=1, fixedRotation=true
-- **States:** Idle, Running, Jumping, DoubleJump, TripleJump, GroundPound, WallSlide, Falling
-- **Game state:** coins, stars, lives (100 coins = 1 extra life)
+- **States:** Idle, Running, Jumping, DoubleJump, TripleJump, GroundPound, WallSlide, Falling, Dead
+- **Game state:** coins, stars, lives (100 coins = 1 extra life), isGameOver, isDead
+- **Public methods:** `die()`, `respawn()`, `resetGame()`, `collectCoin()`, `collectStar()`
 - **Pattern:** State machine enum + switch-based animation
+- **Movement speeds:** walk=7, run=12 (with gravity=-25)
+- **Jump forces:** single=13, double=15, triple=19
 
 ### Platform (Static Surface)
 - **File:** `src/game/objects/Platform.ts`
@@ -147,3 +150,97 @@ for (const pos of positions) {
 ```
 
 Decorative objects (trees, pipes) are added directly to the scene without being tracked as entities.
+
+### World Collision Detection
+
+World.ts manages typed arrays of game objects for collision checking:
+```typescript
+private mario: Mario | null = null;
+private coins: Coin[] = [];
+private goombas: Goomba[] = [];
+```
+
+Collisions are checked each frame in `update()` after entity updates:
+```typescript
+if (this.mario && !this.mario.isDead && !this.mario.isGameOver) {
+  this.checkCoinCollisions();
+  this.checkGoombaCollisions();
+}
+```
+
+---
+
+## Patterns Added: 2026-02-11
+
+### Pattern: Death Animation
+Disable `collisionResponse` so the body ignores platforms, apply upward velocity for a "pop" effect, spin the mesh, then handle respawn or game-over after a timer:
+```typescript
+die(): void {
+  if (this.isDead) return;
+  this.isDead = true;
+  this.state = MarioState.Dead;
+  this.deathTimer = 0;
+  this.body.collisionResponse = false;
+  this.body.velocity.set(0, 12, 0); // Pop up
+}
+
+// In update(), when isDead:
+this.mesh.rotation.z = this.deathTimer * 3; // Spin
+if (this.deathTimer > 2) this.handleDeathComplete();
+```
+
+### Pattern: Distance-Based Collision (World-Level)
+Check distance between bodies in the World update loop instead of relying on physics events for game logic:
+```typescript
+private checkCollisions(): void {
+  const marioPos = this.mario.body.position;
+  for (const obj of this.targetObjects) {
+    if (!obj.isActive) continue;
+    const dx = marioPos.x - obj.body.position.x;
+    const dy = marioPos.y - obj.body.position.y;
+    const dz = marioPos.z - obj.body.position.z;
+    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (dist < hitRadius) {
+      // Handle collision
+    }
+  }
+}
+```
+**When to use:** For game-logic collisions (collecting items, enemy hits) where cannon-es trigger events are unreliable or hard to wire up. Keep radius values small: 1.0-1.2 for contact, 0.5-0.8 for precision.
+
+### Pattern: Game State Reset
+Separate `respawn()` (position reset) from `resetGame()` (full state reset) for clean restart flow:
+```typescript
+respawn(): void {
+  this.body.position.set(0, 5, 0);
+  this.body.velocity.set(0, 0, 0);
+  this.isGrounded = false;
+}
+
+resetGame(): void {
+  this.lives = 3;
+  this.coins = 0;
+  this.stars = 0;
+  this.isGameOver = false;
+  this.isDead = false;
+  this.respawn();
+}
+```
+
+### Pattern: Game-Over UI Overlay
+Use a CSS overlay (`display: none` toggled to `display: flex` via `.visible` class) controlled from `main.ts`:
+```typescript
+// In game loop:
+if (mario.isGameOver && !gameOverShown) {
+  gameOverShown = true;
+  gameOverEl.classList.add('visible');
+  document.exitPointerLock();
+}
+
+// Restart handler:
+restartBtn.addEventListener('click', () => {
+  mario.resetGame();
+  gameOverEl.classList.remove('visible');
+  gameOverShown = false;
+});
+```

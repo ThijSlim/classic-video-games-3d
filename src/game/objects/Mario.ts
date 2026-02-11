@@ -19,27 +19,32 @@ enum MarioState {
   TripleJump = 'triple_jump',
   GroundPound = 'ground_pound',
   WallSlide = 'wall_slide',
+  Dead = 'dead',
 }
 
 export class Mario extends GameObject {
   private input: InputManager;
   private state: MarioState = MarioState.Idle;
-  private moveSpeed = 8;
-  private runSpeed = 14;
-  private jumpForce = 12;
-  private doubleJumpForce = 14;
-  private tripleJumpForce = 18;
+  private moveSpeed = 14;
+  private runSpeed = 22;
+  private jumpForce = 13;
+  private doubleJumpForce = 15;
+  private tripleJumpForce = 19;
   private isGrounded = false;
   private jumpCount = 0;
   private jumpTimer = 0;
   private groundPounding = false;
   private facingAngle = 0;
   private marioGroup!: THREE.Group;
+  private groundContactCount = 0;
+  private deathTimer = 0;
 
   // Game state
   coins = 0;
   stars = 0;
   lives = 3;
+  isGameOver = false;
+  isDead = false;
 
   // Animation
   private animationTime = 0;
@@ -265,16 +270,15 @@ export class Mario extends GameObject {
     this.body.addEventListener('collide', (event: any) => {
       const contact = event.contact;
       const normal = contact.ni;
-      // If the collision normal points upward, we're on the ground
-      if (normal.y > 0.5 || normal.y < -0.5) {
-        // Check which body is which to get correct normal direction
-        const isBodyA = event.body === this.body;
-        const upDot = isBodyA ? -normal.y : normal.y;
-        if (upDot > 0.5) {
-          this.isGrounded = true;
-          this.jumpCount = 0;
-          this.groundPounding = false;
-        }
+      // Determine correct normal direction relative to Mario
+      const isBodyA = contact.bi === this.body;
+      const upDot = isBodyA ? -normal.y : normal.y;
+      // If collision normal points upward relative to Mario, we're on ground
+      if (upDot > 0.5) {
+        this.groundContactCount++;
+        this.isGrounded = true;
+        this.jumpCount = 0;
+        this.groundPounding = false;
       }
     });
 
@@ -284,14 +288,30 @@ export class Mario extends GameObject {
   update(deltaTime: number): void {
     if (!this.isActive) return;
 
+    // If dead, run death animation and return
+    if (this.isDead) {
+      this.deathTimer += deltaTime;
+      if (this.deathTimer < 0.5) {
+        // Pop up animation
+        this.body.velocity.set(0, 10, 0);
+      }
+      this.mesh.position.set(
+        this.body.position.x,
+        this.body.position.y - 0.5,
+        this.body.position.z
+      );
+      this.mesh.rotation.z = this.deathTimer * 3;
+      if (this.deathTimer > 2) {
+        this.handleDeathComplete();
+      }
+      return;
+    }
+
     this.animationTime += deltaTime;
     this.jumpTimer -= deltaTime;
 
-    // Ground check - if velocity is very low and nearly on ground, consider grounded
-    if (this.body.velocity.y < 0.1 && this.body.velocity.y > -0.5 && this.body.position.y < 1.5) {
-      this.isGrounded = true;
-      this.jumpCount = 0;
-    }
+    // Reset ground contact count each frame — collision events will re-set it
+    this.groundContactCount = 0;
 
     // Movement
     this.handleMovement(deltaTime);
@@ -321,9 +341,21 @@ export class Mario extends GameObject {
     // Update state
     this.updateState();
 
+    // If falling and velocity is near zero, likely resting on surface
+    if (Math.abs(this.body.velocity.y) < 0.3 && !this.isGrounded) {
+      // Use a small downward ray test: if body is resting, consider grounded
+      this.isGrounded = true;
+      this.jumpCount = 0;
+    }
+
+    // If moving downward, mark as not grounded
+    if (this.body.velocity.y < -2) {
+      this.isGrounded = false;
+    }
+
     // Fall death
     if (this.body.position.y < -20) {
-      this.respawn();
+      this.die();
     }
   }
 
@@ -447,15 +479,43 @@ export class Mario extends GameObject {
     this.stars++;
   }
 
-  private respawn(): void {
+  /** Called when Mario touches a Goomba or takes lethal damage */
+  die(): void {
+    if (this.isDead) return;
+    this.isDead = true;
+    this.state = MarioState.Dead;
+    this.deathTimer = 0;
+    // Disable physics response so Mario flies up
+    this.body.collisionResponse = false;
+    this.body.velocity.set(0, 12, 0);
+  }
+
+  private handleDeathComplete(): void {
     this.lives--;
+    this.isDead = false;
+    this.body.collisionResponse = true;
+    this.mesh.rotation.z = 0;
+
+    if (this.lives <= 0) {
+      this.isGameOver = true;
+    } else {
+      this.respawn();
+    }
+  }
+
+  respawn(): void {
     this.body.position.set(0, 5, 0);
     this.body.velocity.set(0, 0, 0);
-    if (this.lives <= 0) {
-      // Game over - reset
-      this.lives = 3;
-      this.coins = 0;
-      this.stars = 0;
-    }
+    this.isGrounded = false;
+    this.state = MarioState.Falling;
+  }
+
+  resetGame(): void {
+    this.lives = 3;
+    this.coins = 0;
+    this.stars = 0;
+    this.isGameOver = false;
+    this.isDead = false;
+    this.respawn();
   }
 }

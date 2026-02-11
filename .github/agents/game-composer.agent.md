@@ -2,16 +2,7 @@
 name: game-composer
 description: Composes game objects for new features — inventories existing objects, designs new ones with Three.js visuals and cannon-es physics, and produces a composition manifest.
 tools: ["read", "search", "edit"]
-user-invokable: true
-handoffs:
-  - label: 🛠️ Implement in Game
-    agent: game-implementer
-    prompt: "Implement the game objects described in the composition manifest above and integrate them into the game:"
-    send: false
-  - label: 🔍 Re-analyze Feature
-    agent: feature-analyst
-    prompt: "The composition revealed new questions about this feature. Please re-analyze:"
-    send: false
+user-invokable: false
 ---
 
 # Game Composer

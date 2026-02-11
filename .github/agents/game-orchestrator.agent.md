@@ -3,23 +3,6 @@ name: game-orchestrator
 description: Orchestrates the full game feature development workflow — from analysis through implementation to learning. Use this agent when you want end-to-end feature development on the 3D platformer.
 tools: ["read", "search", "edit", "execute", "agent", "web", "todo"]
 agents: ["feature-analyst", "game-composer", "game-implementer", "learning"]
-handoffs:
-  - label: 🔍 Analyze Feature
-    agent: feature-analyst
-    prompt: "Analyze the following feature request and produce a detailed step-by-step implementation plan:"
-    send: false
-  - label: 🧩 Compose Game Objects
-    agent: game-composer
-    prompt: "Based on the analysis above, identify all required game objects — reuse existing ones and design new ones:"
-    send: false
-  - label: 🛠️ Implement in Game
-    agent: game-implementer
-    prompt: "Implement the composed game objects and integrate them into the game codebase:"
-    send: false
-  - label: 📚 Learn & Update
-    agent: learning
-    prompt: "Review what was implemented, extract best practices, and update the skills and agent configurations:"
-    send: false
 ---
 
 # Game Development Orchestrator

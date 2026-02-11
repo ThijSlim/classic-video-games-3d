@@ -48,7 +48,7 @@ export class GameEngine {
       gravity: new CANNON.Vec3(0, -25, 0), // Stronger gravity for platformer feel
     });
     this.physicsWorld.broadphase = new CANNON.SAPBroadphase(this.physicsWorld);
-    this.physicsWorld.defaultContactMaterial.friction = 0.3;
+    this.physicsWorld.defaultContactMaterial.friction = 0;
     this.physicsWorld.defaultContactMaterial.restitution = 0.1;
 
     // Lighting
@@ -108,13 +108,13 @@ export class GameEngine {
 
     const deltaTime = Math.min(this.clock.getDelta(), 0.05); // Cap delta time
 
-    // Step physics
-    this.physicsWorld.step(1 / 60, deltaTime, 3);
-
-    // Run update callbacks
+    // Run update callbacks first so velocity is set before physics integration
     for (const cb of this.updateCallbacks) {
       cb(deltaTime);
     }
+
+    // Step physics
+    this.physicsWorld.step(1 / 60, deltaTime, 3);
 
     // Render
     this.renderer.render(this.scene, this.camera);

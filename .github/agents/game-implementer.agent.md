@@ -2,16 +2,7 @@
 name: game-implementer
 description: Implements game objects and features in the 3D platformer codebase — writes TypeScript classes, integrates into World.ts, and validates the full game loop.
 tools: ["read", "search", "edit", "execute", "todo"]
-user-invokable: true
-handoffs:
-  - label: 📚 Learn from Implementation
-    agent: learning
-    prompt: "Review the implementation above, extract patterns and best practices, and update the skills:"
-    send: false
-  - label: 🧩 Revisit Composition
-    agent: game-composer
-    prompt: "The implementation revealed issues with the object design. Please revise the composition:"
-    send: false
+user-invokable: false
 ---
 
 # Game Implementer
@@ -125,6 +116,34 @@ for (const pos of positions) {
   this.addEntity(new NewObject(this.engine, pos));
 }
 ```
+
+### Collision Detection in World.ts
+For game-logic collisions (collection, damage), use distance-based checks in `update()`:
+```typescript
+// Keep typed arrays alongside generic entities
+private coins: Coin[] = [];
+private goombas: Goomba[] = [];
+
+// In buildLevel(), track objects in typed arrays too
+const coin = new Coin(this.engine, pos);
+this.coins.push(coin);
+this.addEntity(coin);
+
+// Check collisions after entity updates
+private checkCoinCollisions(): void {
+  for (const coin of this.coins) {
+    if (!coin.isActive) continue;
+    // distance check, then coin.destroy() + mario.collectCoin()
+  }
+}
+```
+
+### UI Overlay Pattern
+When adding new game states that need full-screen UI (game-over, pause, level-complete):
+1. Add HTML overlay in `index.html` with `display: none`
+2. Toggle visibility via CSS class from `main.ts`
+3. Use `document.exitPointerLock()` when showing, re-lock on dismiss
+4. Keep game state flags on the relevant game object (e.g., `mario.isGameOver`)
 
 ### Engine API Reference
 - `this.engine.addToScene(mesh)` — Add Three.js object to scene
