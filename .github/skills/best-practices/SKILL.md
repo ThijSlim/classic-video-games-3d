@@ -140,5 +140,38 @@ addEntity(entity: GameObject): void {
 
 ---
 
+## 3D Model Loading (Added 2026-02-11)
+
+### Using External 3D Models vs Primitives
+- **Prefer external models** (`.dae`, `.fbx`, `.glb`) for complex characters like Mario — they look much better than hand-built primitive shapes
+- **Keep primitives** for simple geometric objects (platforms, coins, basic enemies) where the box/sphere/cylinder aesthetic fits the style
+- **Hybrid approach works:** Load a 3D model for the character mesh but use a simple `CANNON.Box` for physics — the physics shape doesn't need to match the visual exactly
+
+### Async Model Loading Checklist
+1. Start loading in `create()` — the object is functional with physics before the model arrives
+2. Add a `modelLoaded` boolean flag, initially `false`
+3. Set `modelLoaded = true` inside the loader callback
+4. Guard animation/visual code with `if (!this.modelLoaded) return`
+5. The object still participates in physics while the model loads — the player can move immediately
+
+### Model Container Hierarchy
+For loaded models that need animation, use a 3-level hierarchy:
+```
+marioGroup (THREE.Group)      ← this.mesh, rotated to face direction
+  ├── shadow (PlaneGeometry)  ← shadow decal, always flat on ground
+  └── container (THREE.Group) ← isolates loader's Z_UP rotation
+       └── model (loaded scene) ← the actual 3D model
+```
+This prevents animation code on `marioGroup` from conflicting with coordinate system corrections applied by the loader.
+
+### Asset File Conventions
+- Store assets in `public/assets/<object-name>/`
+- Primary model file + all referenced textures in the same folder
+- Texture naming: `<object>_<part>.png` (e.g., `mario_eyes_center.png`)
+- Editor variants: `<object>_<part>_edit.png` suffix
+- Unused variants: `<part>_unused.png` suffix (kept for future use)
+
+---
+
 *Last updated: 2026-02-11*
-*Updated by: learning agent — movement/jumping/game-over feature cycle*
+*Updated by: learning agent — Mario 3D model loading & asset patterns*

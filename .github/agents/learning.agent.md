@@ -2,7 +2,7 @@
 name: learning
 description: Reviews completed implementations, extracts best practices and reusable patterns, and updates skills and agent configurations to improve future development cycles.
 tools: ["read", "search", "edit"]
-user-invokable: false
+user-invokable: true
 ---
 
 # Learning Agent

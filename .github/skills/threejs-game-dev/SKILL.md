@@ -210,10 +210,42 @@ Useful for death animations (body pops up then falls through floor).
 Tuned values that feel right with the project's strong gravity:
 | Parameter | Value | Notes |
 |-----------|-------|-------|
-| Walk speed | 7 | Camera-relative |
-| Run speed | 12 | Hold Shift |
+| Walk speed | 14 | Camera-relative |
+| Run speed | 22 | Hold Shift |
 | Jump force | 13 | Single jump |
 | Double jump | 15 | Within 0.4s window |
 | Triple jump | 19 | Within 0.4s window |
 | Ground pound | -20 | Instant downward velocity |
 | Death pop | 12 | Upward velocity on die |
+
+### Loading 3D Models with ColladaLoader
+The project uses `ColladaLoader` from `three/examples/jsm/loaders/ColladaLoader.js` to load `.dae` (Collada) model files.
+
+**Z_UP Container Pattern:** ColladaLoader may apply a rotation to convert from Z_UP to Y_UP coordinate systems. If you also need to rotate/animate the model, wrap it in an intermediate `THREE.Group` container so the loader's correction isn't overwritten:
+```typescript
+const container = new THREE.Group();
+container.add(collada.scene);
+parentGroup.add(container);
+```
+
+**Model Scaling:** External models often use different unit scales. Calculate scale factor as `desiredSize / nativeSize` (e.g., ~90 native units → 0.02 scale for ~1.8 game units).
+
+**Shadow Traversal:** Loaded models don't have shadows enabled by default. Traverse all children:
+```typescript
+model.traverse((child) => {
+  if ((child as THREE.Mesh).isMesh) {
+    (child as THREE.Mesh).castShadow = true;
+    (child as THREE.Mesh).receiveShadow = true;
+  }
+});
+```
+
+**Async Loading Guard:** Since model loading is async, use a boolean flag (`modelLoaded`) and guard any code that depends on the model's presence.
+
+### Asset Organization
+Store model files and their textures together under `public/assets/<name>/`. Textures referenced by `.dae` files are resolved relative to the model file. Current asset structure:
+- `/public/assets/mario/mario.dae` — Collada model (primary)
+- `/public/assets/mario/mario.fbx` — FBX format (alternative)
+- `/public/assets/mario/*.png` — Textures (color maps, eye variants, detail textures)
+
+Serve assets from `public/` so Vite makes them available at the root path (e.g., `/assets/mario/mario.dae`).

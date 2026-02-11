@@ -38,13 +38,14 @@ export abstract class GameObject {
 ### Mario (Player Character)
 - **File:** `src/game/objects/Mario.ts`
 - **Config:** `InputManager` (no config object — takes input directly)
-- **Visual:** Multi-part character built from boxes, cylinders, spheres (body, head, hat, arms, legs, eyes, mustache)
+- **Visual:** Collada 3D model loaded from `/assets/mario/mario.dae` via `ColladaLoader`. Native model ~90 units tall, scaled 0.02 to ~1.8 game units. Includes shadow decal plane beneath. Model wrapped in container group to preserve Z_UP rotation from loader.
+- **Assets:** `/public/assets/mario/` — `mario.dae` (Collada model), `mario.fbx` (FBX alternative), ~30 texture PNGs (eyes variants: center/closed/dead/half_closed/left/right/up/down; colors: blue/red/white/skin/shoe/hair; overalls_button, mustache, sideburn, logo, metal, wing/wing_tip). Textures with `_edit` suffix are editor variants.
 - **Physics:** `CANNON.Box(0.3, 0.5, 0.3)`, mass=1, fixedRotation=true
 - **States:** Idle, Running, Jumping, DoubleJump, TripleJump, GroundPound, WallSlide, Falling, Dead
 - **Game state:** coins, stars, lives (100 coins = 1 extra life), isGameOver, isDead
 - **Public methods:** `die()`, `respawn()`, `resetGame()`, `collectCoin()`, `collectStar()`
 - **Pattern:** State machine enum + switch-based animation
-- **Movement speeds:** walk=7, run=12 (with gravity=-25)
+- **Movement speeds:** walk=14, run=22 (with gravity=-25)
 - **Jump forces:** single=13, double=15, triple=19
 
 ### Platform (Static Surface)
@@ -226,6 +227,41 @@ resetGame(): void {
   this.respawn();
 }
 ```
+
+### Pattern: Loading External 3D Models (Collada)
+Use `ColladaLoader` to load `.dae` models. Wrap the loaded scene in a container group to isolate the loader's Z_UP rotation correction from your own animation transforms. Guard animation code with a `modelLoaded` flag since loading is async.
+```typescript
+import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js';
+
+private modelLoaded = false;
+
+private loadModel(): void {
+  const loader = new ColladaLoader();
+  loader.load('/assets/mario/mario.dae', (collada) => {
+    const model = collada.scene;
+    const s = 0.02; // Scale native units to game units
+    model.scale.set(s, s, s);
+
+    // Enable shadows on all meshes
+    model.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        (child as THREE.Mesh).castShadow = true;
+        (child as THREE.Mesh).receiveShadow = true;
+      }
+    });
+
+    // Wrap to preserve loader's rotation
+    const container = new THREE.Group();
+    container.add(model);
+    this.marioGroup.add(container);
+    this.modelLoaded = true;
+  });
+}
+```
+**Key points:**
+- The loader may apply a Z_UP → Y_UP rotation on the scene root; wrapping in a container prevents animation code from overwriting it
+- Always enable `castShadow`/`receiveShadow` via `traverse()` on loaded models
+- Use `modelLoaded` flag to skip animation until the model is ready
 
 ### Pattern: Game-Over UI Overlay
 Use a CSS overlay (`display: none` toggled to `display: flex` via `.visible` class) controlled from `main.ts`:
