@@ -97,6 +97,7 @@ Accumulated knowledge from building **Super Mario 3D Web Edition**. This file is
 7. **Position-based ground checks** — Never use `body.position.y < N` to detect ground; it breaks on elevated platforms. Use collision normals instead
 8. **Wrong collision normal sign** — `contact.ni` direction depends on body order (`contact.bi` vs `contact.bj`); always check `contact.bi === this.body` before reading the normal
 9. **Missing isDead/isGameOver guards** — Always skip collision checks and input handling when Mario is dead or game is over
+10. **Missing velocity reset on no input** — When using direct velocity control (`body.velocity.x = speed`), always zero velocity in the "no input" branch. An early `return` without zeroing leaves the body sliding forever (especially with low friction/damping)
 
 ---
 

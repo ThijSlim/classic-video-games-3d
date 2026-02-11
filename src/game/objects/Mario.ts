@@ -361,7 +361,11 @@ export class Mario extends GameObject {
 
   private handleMovement(deltaTime: number): void {
     const { x, z } = this.input.movementVector;
-    if (x === 0 && z === 0) return;
+    if (x === 0 && z === 0) {
+      this.body.velocity.x = 0;
+      this.body.velocity.z = 0;
+      return;
+    }
 
     const speed = this.input.run ? this.runSpeed : this.moveSpeed;
 
