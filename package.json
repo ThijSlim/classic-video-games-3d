@@ -1,0 +1,29 @@
+{
+  "name": "mario-64-3d-web",
+  "version": "0.1.0",
+  "description": "Super Mario 64 style 3D platformer for the web, built with Three.js and an agentic development workflow",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "agents": "tsx agents/orchestrator.ts",
+    "agent:analyze": "tsx agents/orchestrator.ts --agent=analysis",
+    "agent:compose": "tsx agents/orchestrator.ts --agent=composer",
+    "agent:implement": "tsx agents/orchestrator.ts --agent=implementation",
+    "agent:learn": "tsx agents/orchestrator.ts --agent=learning"
+  },
+  "dependencies": {
+    "three": "^0.170.0",
+    "cannon-es": "^0.20.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.170.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "tsx": "^4.19.0",
+    "yaml": "^2.7.0",
+    "glob": "^11.0.0",
+    "@types/node": "^22.0.0"
+  }
+}

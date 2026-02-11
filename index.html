@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Mario 3D - Web Edition</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+    canvas { display: block; width: 100%; height: 100%; }
+    #loading {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff; font-family: 'Arial', sans-serif; z-index: 100;
+      transition: opacity 0.5s;
+    }
+    #loading.hidden { opacity: 0; pointer-events: none; }
+    #loading h1 { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    #loading .subtitle { font-size: 1.2rem; color: #e94560; margin-bottom: 2rem; }
+    #loading .progress-bar { width: 300px; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+    #loading .progress-fill { width: 0%; height: 100%; background: #e94560; border-radius: 4px; transition: width 0.3s; }
+    #hud {
+      position: fixed; top: 20px; left: 20px; color: #fff; font-family: 'Arial', sans-serif;
+      font-size: 1.1rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); z-index: 10;
+    }
+    #hud .coins { color: #ffd700; }
+    #hud .stars { color: #ffeb3b; }
+    #hud .lives { color: #ff5722; }
+    #controls-overlay {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.5); font-family: 'Arial', sans-serif;
+      font-size: 0.85rem; text-align: center; z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <h1>⭐ Super Mario 3D ⭐</h1>
+    <div class="subtitle">Web Edition</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div id="hud">
+    <div class="coins">🪙 Coins: <span id="coin-count">0</span></div>
+    <div class="stars">⭐ Stars: <span id="star-count">0</span></div>
+    <div class="lives">❤️ Lives: <span id="life-count">3</span></div>
+  </div>
+
+  <div id="controls-overlay">
+    WASD / Arrow Keys: Move | Space: Jump | Shift: Run | Mouse: Camera
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
