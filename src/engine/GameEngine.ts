@@ -17,6 +17,7 @@ export class GameEngine {
 
   private updateCallbacks: ((dt: number) => void)[] = [];
   private running = false;
+  private resizeHandler = () => this.onResize();
 
   async init(): Promise<void> {
     // Scene
@@ -61,7 +62,7 @@ export class GameEngine {
     this.clock = new THREE.Clock();
 
     // Handle resize
-    window.addEventListener('resize', () => this.onResize());
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   private setupLighting(): void {
@@ -140,5 +141,41 @@ export class GameEngine {
 
   removePhysicsBody(body: CANNON.Body): void {
     this.physicsWorld.removeBody(body);
+  }
+
+  dispose(): void {
+    // Stop game loop
+    this.stop();
+
+    // Remove event listeners
+    window.removeEventListener('resize', this.resizeHandler);
+
+    // Clear callbacks
+    this.updateCallbacks = [];
+
+    // Dispose of Three.js objects
+    this.scene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.geometry?.dispose();
+        if (object.material) {
+          if (Array.isArray(object.material)) {
+            object.material.forEach(mat => mat.dispose());
+          } else {
+            object.material.dispose();
+          }
+        }
+      }
+    });
+
+    // Remove and dispose renderer
+    this.renderer.dispose();
+    if (this.renderer.domElement.parentElement) {
+      this.renderer.domElement.parentElement.removeChild(this.renderer.domElement);
+    }
+
+    // Clear physics world
+    while (this.physicsWorld.bodies.length > 0) {
+      this.physicsWorld.removeBody(this.physicsWorld.bodies[0]);
+    }
   }
 }

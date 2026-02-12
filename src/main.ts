@@ -81,6 +81,31 @@ async function main() {
   });
 
   engine.start();
+
+  // Return cleanup function for HMR
+  return () => {
+    engine.stop();
+    engine.dispose();
+    input.dispose();
+    world.dispose();
+  };
 }
 
-main().catch(console.error);
+// Initialize game
+let cleanup: (() => void) | null = null;
+
+main().then((cleanupFn) => {
+  cleanup = cleanupFn;
+}).catch(console.error);
+
+// Vite HMR - Hot Module Replacement
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    console.log('🔄 Hot reloading game...');
+    if (cleanup) {
+      cleanup();
+    }
+    // Reload the page for game updates
+    location.reload();
+  });
+}

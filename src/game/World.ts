@@ -28,7 +28,7 @@ export class World {
     // === Main ground platform ===
     this.addEntity(new Platform(this.engine, {
       position: { x: 0, y: -0.5, z: 0 },
-      size: { x: 40, y: 1, z: 40 },
+      size: { x: 240, y: 1, z: 240 },
       color: 0x4CAF50, // Green grass
     }));
 
@@ -278,5 +278,18 @@ export class World {
         this.mario.die();
       }
     }
+  }
+
+  dispose(): void {
+    // Clean up all entities
+    for (const entity of this.entities) {
+      if (entity.destroy) {
+        entity.destroy();
+      }
+    }
+    this.entities = [];
+    this.coins = [];
+    this.goombas = [];
+    this.mario = null;
   }
 }

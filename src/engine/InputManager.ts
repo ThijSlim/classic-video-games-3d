@@ -7,11 +7,14 @@ export class InputManager {
   private keys: Map<string, boolean> = new Map();
   private keysJustPressed: Map<string, boolean> = new Map();
   private mouseMovement = { x: 0, y: 0 };
+  private keyDownHandler = (e: KeyboardEvent) => this.onKeyDown(e);
+  private keyUpHandler = (e: KeyboardEvent) => this.onKeyUp(e);
+  private mouseMoveHandler = (e: MouseEvent) => this.onMouseMove(e);
 
   constructor(canvas: HTMLElement) {
-    window.addEventListener('keydown', (e) => this.onKeyDown(e));
-    window.addEventListener('keyup', (e) => this.onKeyUp(e));
-    window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    window.addEventListener('keydown', this.keyDownHandler);
+    window.addEventListener('keyup', this.keyUpHandler);
+    window.addEventListener('mousemove', this.mouseMoveHandler);
   }
 
   private onKeyDown(event: KeyboardEvent): void {
@@ -90,5 +93,13 @@ export class InputManager {
       z /= len;
     }
     return { x, z };
+  }
+
+  dispose(): void {
+    window.removeEventListener('keydown', this.keyDownHandler);
+    window.removeEventListener('keyup', this.keyUpHandler);
+    window.removeEventListener('mousemove', this.mouseMoveHandler);
+    this.keys.clear();
+    this.keysJustPressed.clear();
   }
 }

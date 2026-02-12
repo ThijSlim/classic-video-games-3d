@@ -8,15 +8,15 @@ import * as THREE from 'three';
 export class CameraController {
   private camera: THREE.PerspectiveCamera;
   private offset = new THREE.Vector3(0, 6, 12);
-  private lookAtOffset = new THREE.Vector3(0, 2, 0);
+  private lookAtOffset = new THREE.Vector3(0, 1, 0);
   private currentPosition = new THREE.Vector3();
   private currentLookAt = new THREE.Vector3();
   private smoothSpeed = 5;
   private rotationX = 0;
   private rotationY = 0.3;
-  private distance = 12;
-  private minDistance = 4;
-  private maxDistance = 25;
+  private distance = 8;
+  private minDistance = 3;
+  private maxDistance = 20;
   private minPolarAngle = 0.1;
   private maxPolarAngle = Math.PI / 2.2;
 
@@ -50,7 +50,7 @@ export class CameraController {
 
     const desiredPosition = new THREE.Vector3(
       targetPosition.x + offsetX,
-      targetPosition.y + offsetY + 2,
+      targetPosition.y + offsetY + 1,
       targetPosition.z + offsetZ
     );
 
