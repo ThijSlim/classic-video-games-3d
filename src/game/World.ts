@@ -11,6 +11,7 @@ import { Platform } from './objects/Platform';
 import { Coin } from './objects/Coin';
 import { Goomba } from './objects/Goomba';
 import { Mario } from './objects/Mario';
+import { PeachCastle } from './objects/PeachCastle';
 
 export class World {
   private engine: GameEngine;
@@ -32,24 +33,8 @@ export class World {
       color: 0x4CAF50, // Green grass
     }));
 
-    // === Castle area - raised platform ===
-    this.addEntity(new Platform(this.engine, {
-      position: { x: 0, y: 0.5, z: -18 },
-      size: { x: 12, y: 2, z: 8 },
-      color: 0x9E9E9E, // Stone gray
-    }));
-
-    // Castle towers
-    this.addEntity(new Platform(this.engine, {
-      position: { x: -5, y: 4, z: -20 },
-      size: { x: 3, y: 8, z: 3 },
-      color: 0xBDBDBD,
-    }));
-    this.addEntity(new Platform(this.engine, {
-      position: { x: 5, y: 4, z: -20 },
-      size: { x: 3, y: 8, z: 3 },
-      color: 0xBDBDBD,
-    }));
+    // === Peach's Castle ===
+    this.addEntity(new PeachCastle(this.engine, { position: { x: 0, y: 0, z: -25 } }));
 
     // === Floating platforms ===
     const floatingPlatforms = [
@@ -114,7 +99,7 @@ export class World {
       { x: 5, y: 1, z: 5, patrolRadius: 3 },
       { x: -5, y: 1, z: 5, patrolRadius: 4 },
       { x: 10, y: 1, z: -5, patrolRadius: 3 },
-      { x: -10, y: 1, z: -8, patrolRadius: 5 },
+      { x: -15, y: 1, z: 8, patrolRadius: 5 },
     ];
 
     for (const g of goombaPositions) {
@@ -136,8 +121,8 @@ export class World {
       { x: -15, z: -10 },
       { x: -18, z: 0 },
       { x: 18, z: 0 },
-      { x: 10, z: -15 },
-      { x: -10, z: -15 },
+      { x: 25, z: -15 },
+      { x: -25, z: -15 },
     ];
 
     for (const pos of treePositions) {
@@ -146,7 +131,7 @@ export class World {
 
     // Pipe
     this.createPipe(12, 0, -8);
-    this.createPipe(-8, 0, -12);
+    this.createPipe(-12, 0, -5);
   }
 
   private createTree(x: number, z: number): void {

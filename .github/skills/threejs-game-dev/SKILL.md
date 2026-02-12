@@ -249,3 +249,103 @@ Store model files and their textures together under `public/assets/<name>/`. Tex
 - `/public/assets/mario/*.png` — Textures (color maps, eye variants, detail textures)
 
 Serve assets from `public/` so Vite makes them available at the root path (e.g., `/assets/mario/mario.dae`).
+
+---
+
+## Techniques Added: 2026-02-12
+
+### Rectangular Hip Roof via ConeGeometry
+Create a hip roof (pyramid shape with rectangular base) using a 4-sided `ConeGeometry` rotated 45° and scaled non-uniformly on one axis:
+```typescript
+const roof = new THREE.Mesh(
+  new THREE.ConeGeometry(15.56, 6, 4), // 4 sides = square pyramid
+  roofMat,
+);
+roof.rotation.y = Math.PI / 4;   // Rotate 45° to align edges with walls
+roof.scale.z = 0.727;            // Compress Z to make rectangular (ratio = shortSide / longSide)
+roof.position.set(0, 16, 0);
+```
+**Key insight:** A 4-sided cone is a pyramid. The `radiusTop=0` default makes it a perfect point. The radius should be calculated so the base covers the building: `radius = (longSide / 2) * sqrt(2)` for a square, then scale one axis to make it rectangular.
+**Formula:** `scale.z = shortSide / longSide` (e.g., 16/22 ≈ 0.727 for a 22×16 building).
+
+### Semi-Circular Arch Construction
+Build a detailed entrance arch by combining three primitives:
+```typescript
+// 1. Rectangular void (door opening)
+const doorVoid = new THREE.Mesh(
+  new THREE.BoxGeometry(2.5, 3, 1.2),
+  darkMat,
+);
+doorVoid.position.set(0, 3.5, wallZ);
+
+// 2. Half-cylinder for the arch top
+const archTop = new THREE.Mesh(
+  new THREE.CylinderGeometry(1.25, 1.25, 1.2, 16, 1, false, 0, Math.PI),
+  darkMat,
+);
+archTop.position.set(0, 5, wallZ);
+archTop.rotation.z = Math.PI / 2;  // Stand upright
+archTop.rotation.x = Math.PI / 2;  // Face forward
+
+// 3. Half-torus for the stone surround
+const archSurround = new THREE.Mesh(
+  new THREE.TorusGeometry(1.35, 0.15, 8, 16, Math.PI),
+  stoneMat,
+);
+archSurround.position.set(0, 5, wallZ - 0.01); // Slightly in front
+archSurround.rotation.z = Math.PI;  // Arch opens downward
+```
+**Technique:** Use `CylinderGeometry(r, r, depth, seg, 1, false, 0, Math.PI)` for a half-cylinder. The `thetaStart=0, thetaLength=Math.PI` parameters create the half shape. Combine rotations to orient it correctly.
+**Tip:** The torus surround radius should be slightly larger than the cylinder so it frames the arch visually.
+
+### Z-Fighting Prevention for Facade Decorations
+When placing flat decorations (windows, frames, plaques) on wall surfaces, offset them 0.01–0.02 units from the wall to prevent z-fighting flicker:
+```typescript
+// Wall surface is at z = 8.0
+const window = new THREE.Mesh(circleGeom, darkMat);
+window.position.set(x, y, 8.01);   // 0.01 offset prevents z-fighting
+
+const frame = new THREE.Mesh(frameGeom, goldMat);
+frame.position.set(x, y, 8.02);    // Frame slightly in front of window
+```
+**Rule:** Layer decorations with increasing offsets: wall (0.00) → glass/void (0.01) → frame/trim (0.02). This ensures consistent render order without `depthWrite` hacks.
+
+### Circular Window Construction
+Combine `RingGeometry` (for the trim) and `CircleGeometry` (for the interior) to create circular windows:
+```typescript
+// Gold ring trim
+const ring = new THREE.Mesh(
+  new THREE.RingGeometry(0.35, 0.45, 16), // inner, outer radius
+  goldMat,
+);
+ring.position.set(x, y, wallZ + 0.01);
+
+// Dark interior
+const circle = new THREE.Mesh(
+  new THREE.CircleGeometry(0.35, 16),
+  darkMat,
+);
+circle.position.set(x, y, wallZ + 0.01);
+```
+
+### Moat / Water Ring Effect
+Use `RingGeometry` with a transparent water material for a moat around a structure:
+```typescript
+const moat = new THREE.Mesh(
+  new THREE.RingGeometry(15, 19, 32),  // inner, outer radius
+  new THREE.MeshStandardMaterial({ color: 0x2196F3, transparent: true, opacity: 0.6, roughness: 0.1 }),
+);
+moat.position.set(0, 0.05, 0);      // Just above ground
+moat.rotation.x = -Math.PI / 2;     // Lay flat
+```
+
+### Large Structure Material Strategy
+Define all materials upfront and reuse across meshes. For PeachCastle, 10 materials serve ~49 meshes:
+```typescript
+// Define once at the top of create()
+const stoneMat = new THREE.MeshStandardMaterial({ color: 0xD3CFC7, roughness: 0.9 });
+const roofMat  = new THREE.MeshStandardMaterial({ color: 0xC85A34, roughness: 0.7 });
+const woodMat  = new THREE.MeshStandardMaterial({ color: 0x8B6914, roughness: 0.85 });
+// ... reuse everywhere
+```
+**Performance benefit:** Fewer material instances = fewer GPU state changes during rendering. Three.js can batch meshes that share the same material.

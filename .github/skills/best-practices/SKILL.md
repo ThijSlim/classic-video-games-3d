@@ -173,5 +173,57 @@ This prevents animation code on `marioGroup` from conflicting with coordinate sy
 
 ---
 
-*Last updated: 2026-02-11*
-*Updated by: learning agent — Mario 3D model loading & asset patterns*
+---
+
+## Large Structure Building (Added 2026-02-12)
+
+### Building Complex Structures from Primitives
+When building large multi-part objects like castles or buildings:
+1. **Group everything** — Put all meshes in a single `THREE.Group`, position the group once
+2. **Define materials first** — Create shared materials at the top of `create()` and reuse across all meshes
+3. **Section by section** — Build in logical sections (base → walls → roof → turrets → decorations) with comments separating each section
+4. **Selective physics** — Don't give every mesh a physics body. Only add bodies for surfaces Mario can walk on or collide with (walls, floors, bridges). Decorative elements (windows, flags, trim) don't need physics
+5. **Track all bodies** — Use the Multiple Physics Bodies pattern (array + custom `destroy()`) when >1 body is needed
+
+### Material Reuse Strategy
+For objects with many meshes, define all materials once and reuse:
+```typescript
+// 10 materials × ~49 meshes = significant savings
+const stoneMat = new THREE.MeshStandardMaterial({ color: 0xD3CFC7, roughness: 0.9 });
+const roofMat  = new THREE.MeshStandardMaterial({ color: 0xC85A34, roughness: 0.7 });
+// Reuse references — never create duplicate materials
+```
+**Rule of thumb:** If two meshes have the same color and material properties, they MUST share the same material instance. Creating `new MeshStandardMaterial({ color: 0xFF0000 })` twice wastes GPU resources.
+
+### Scaling from Architectural Reference
+When building real-world structures, establish a scale factor from one known measurement:
+1. Pick a recognizable element (e.g., entrance arch = 4m real-world)
+2. Decide its game-unit size (e.g., 3 game units tall)
+3. Calculate scale factor: `3 / 4 = 0.75 game units per meter`
+4. Apply consistently to ALL measurements
+5. Validate against the player: Mario at 1.8 units should be ~60% of a 3-unit doorway
+
+**PeachCastle reference:** 0.75 gu/m — entrance arch 3gu (4m), main body 11gu tall (14.7m), central tower 15gu (20m)
+
+### Castle Color Palette Addition
+Extending the project's color palette for stone/castle structures:
+- Warm stone: `0xD3CFC7` (main walls)
+- Terracotta roof: `0xC85A34`
+- Old wood: `0x8B6914` (bridge, doors)
+- Water blue: `0x2196F3` (transparent, opacity 0.6)
+- Gold trim: `0xDAA520` (metalness 0.7)
+- Pink glass: `0xFFB6C1` with emissive `0xFF69B4` (stained glass)
+- Dark void: `0x1A1A1A` (window interiors, doorways)
+- Earth brown: `0x6B4226` (mound, foundation)
+
+### World Integration for Large Objects
+When adding a large structure that replaces multiple smaller objects:
+1. Remove the placeholder objects it replaces
+2. Check for overlapping objects (coins, enemies, platforms) and reposition them
+3. A single `addEntity()` call is sufficient — the object manages its own sub-bodies
+4. The castle's physics bodies are self-contained; no extra collision setup needed in World.ts
+
+---
+
+*Last updated: 2026-02-12*
+*Updated by: learning agent — PeachCastle multi-body structure, material reuse, scaling patterns*

@@ -71,6 +71,16 @@ export abstract class GameObject {
 - **Behavior:** Circular patrol path using sin/cos, walk bob animation
 - **Pattern:** Kinematic enemy with config-driven patrol behavior
 
+### PeachCastle (Large Static Structure) — Added 2026-02-12
+- **File:** `src/game/objects/PeachCastle.ts`
+- **Config:** `PeachCastleConfig { position: { x, y, z: number } }`
+- **Visual:** ~49 meshes — earthen mound, moat ring, main body box, hip roof (4-sided cone), central tower + spire, 4 corner turrets with conical roofs, entrance arch (box+half-cylinder+half-torus), bridge with railing posts/beams, stained-glass window with gold frame, 8 circular windows
+- **Physics:** 8 `CANNON.Body` instances (mass=0, static): mound box, main body box, central tower cylinder, 4 turret cylinders, bridge box. Uses **Multiple Physics Bodies pattern** (see below)
+- **Materials:** 10 shared materials reused across all meshes (stone, roof, wood, water, gold, dark, earth, flag, glass, frame)
+- **Behavior:** Static structure, flags animated with sine wave in `update()`
+- **Pattern:** Multi-body static structure with animated decorations
+- **Scale reference:** 0.75 game units per real-world meter (entrance arch = 3 game units for 4m real arch)
+
 ---
 
 ## Common Patterns
@@ -136,6 +146,57 @@ update(deltaTime: number): void {
   this.mesh.position.y = this.startY + Math.sin(this.time * speed) * amplitude;
 }
 ```
+
+### Pattern: Multiple Physics Bodies (Added 2026-02-12)
+When a game object needs more than one collision shape (e.g., a large building with distinct collidable sections), store extra bodies in a private array and override `destroy()` to clean them all up:
+```typescript
+private bodies: CANNON.Body[] = [];
+
+create(): void {
+  // Create each physics body, add to engine, and track it
+  const wallBody = new CANNON.Body({ mass: 0, shape: new CANNON.Box(...) });
+  this.engine.addPhysicsBody(wallBody);
+  this.bodies.push(wallBody);
+
+  // Set one as the primary for GameObject compatibility
+  this.body = mainBody;
+}
+
+destroy(): void {
+  this.isActive = false;
+  if (this.mesh) this.engine.removeFromScene(this.mesh);
+  for (const b of this.bodies) {
+    this.engine.removePhysicsBody(b);
+  }
+}
+```
+**When to use:** Complex structures where a single CANNON shape can't approximate the collision surface (e.g., castle with turrets, bridge, and main body as separate collidable zones).
+**Tip:** Assign the most important body to `this.body` for compatibility with code that expects `GameObject.body`.
+
+### Pattern: Animated Elements on Static Object (Added 2026-02-12)
+Store animated sub-meshes in a typed array and animate them in `update()`. Use index-based phase offsets for visual variety:
+```typescript
+private flags: THREE.Mesh[] = [];
+private flagTime = 0;
+
+create(): void {
+  for (let i = 0; i < 4; i++) {
+    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.5), flagMat);
+    flag.position.set(corners[i].x + 0.4, 20.25, corners[i].z);
+    group.add(flag);
+    this.flags.push(flag);
+  }
+}
+
+update(deltaTime: number): void {
+  if (!this.isActive) return;
+  this.flagTime += deltaTime;
+  for (let i = 0; i < this.flags.length; i++) {
+    this.flags[i].rotation.y = Math.sin(this.flagTime * 3 + i * 1.5) * 0.3;
+  }
+}
+```
+**When to use:** Static objects that need subtle motion for visual interest (flags, torches, spinning gears). The base structure doesn't move, only the decorations.
 
 ---
 
