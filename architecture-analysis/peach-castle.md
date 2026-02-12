@@ -20,7 +20,7 @@
 ## 2. Structural System Analysis
 
 - **Primary structural system:** Load-bearing masonry — thick stone block walls acting as both structure and envelope. Wall thickness estimated at 1.0–1.5m based on window reveal depth.
-- **Foundation type:** Inferred as a combination of strip and raft foundation given the structure sits atop a raised earthen mound/hill with a moat at its base. Likely bearing on bedrock or compacted fill.
+- **Foundation type:** Inferred as a combination of strip and raft foundation given the structure sits on level ground behind a foreground hill, with a deep excavated defensive moat at its base. Likely bearing on bedrock or compacted fill.
 - **Load path description:** Gravity loads transfer through the massive masonry walls directly down to the foundation. The central tower acts as a load-bearing core, with the roofs supported by the perimeter walls and internal cross-walls.
 - **Lateral bracing system:** The thick masonry walls with perpendicular cross-walls at the corner turrets provide inherent lateral stability. The cruciform plan with four corner turrets creates a naturally braced configuration.
 - **Span estimates:**
@@ -74,7 +74,7 @@
 ### Setbacks & Offsets
 - The central tower rises from the roof ridge with no setback — directly above the intersection of the cruciform roof.
 - Corner turrets project slightly beyond the main wall plane (~0.5–1.0m).
-- The main body sits on a raised earthen platform, approximately 2–3m above the moat water level.
+- The main body sits at ground level behind the foreground hill, with the deep defensive moat excavated ~4–6m below the surrounding grade.
 
 **Confidence: Medium** — dimensions estimated from proportional analysis against the entrance arch.
 
@@ -149,42 +149,46 @@
 ## 6. Terrain & Landscape Analysis
 
 ### Topography Classification
-- **Type:** Gently undulating to hilly — a stylized pastoral landscape of rolling green hills with a prominent artificial mound at the center bearing the castle.
+- **Type:** Gently undulating to hilly — a stylized pastoral landscape of rolling green hills with a prominent foreground hill that partially obscures the castle behind it.
+- **Spatial arrangement:** Mario stands on the approach side looking up at the foreground hill. The castle is positioned **behind** this hill, at a lower or similar elevation, with the upper portions of the castle (tower, turrets, roofline) visible rising above the hill's crest. The castle is not on top of the hill.
 - **Character:** The terrain reads as sculpted/constructed rather than naturally eroded — uniform curvature, unnaturally smooth contours, no exposed rock or erosion features. Consistent with a designed royal estate or formal castle grounds.
 
 ### Elevation Profile
 
-| Zone | Estimated Elevation (relative to moat water level = 0m) |
+| Zone | Estimated Elevation (relative to surrounding ground level = 0m) |
 |---|---|
-| Foreground sandy plaza (Mario's position) | −1.0 to 0.0m |
-| Moat water surface | 0.0m (datum) |
-| Surrounding grass fields | +0.5 to +3.0m |
-| Castle mound crest (base of walls) | +6.0 to +8.0m |
-| Hilltops flanking the castle (left & right) | +10.0 to +14.0m |
+| Foreground sandy plaza (Mario's position) | 0.0m (datum) |
+| Foreground hill crest (between Mario and castle) | +8.0 to +10.0m |
+| Castle ground level (behind the hill) | 0.0 to +2.0m |
+| Castle entrance threshold | +0.5 to +1.5m |
+| Moat water surface | −4.0 to −6.0m (deeply excavated below grade) |
+| Moat bottom | −5.5 to −7.5m |
+| Surrounding grass fields | 0.0 to +3.0m |
+| Hilltops flanking the scene (left & right) | +10.0 to +14.0m |
 | Distant ridge / mountain (background right) | +20.0 to +30.0m (estimated) |
-| Castle entrance threshold | +2.0 to +3.0m |
 
-- **Maximum visible elevation change:** ~30m from the sandy foreground to the distant ridge peak.
-- **Castle mound height:** ~6–8m above the surrounding grade — the most prominent constructed terrain feature.
-- **Slope gradients around the castle mound:**
-  - Front approach (south): **moderate 15–20%** (1:6 to 1:5) — gradual enough for the bridge approach.
-  - Flanking sides (east/west): **steep 25–35%** (1:4 to 1:3) — the mound falls away more steeply to the sides.
-  - Rear (north): not visible, assumed similar to flanking slopes.
+- **Maximum visible elevation change:** ~36m from the moat bottom to the distant ridge peak.
+- **Foreground hill height:** ~8–10m above the foreground plaza — the dominant terrain feature separating Mario from the castle.
+- **Moat depth below grade:** ~4–6m — a deeply excavated medieval-style defensive trench with water at the bottom, well below the surrounding ground level.
+- **Slope gradients on the foreground hill:**
+  - Front face (Mario's side / south): **moderate 15–25%** (1:6 to 1:4) — a climbable grass slope.
+  - Rear face (castle side / north): **steeper 25–40%** (1:4 to 1:2.5) — drops down toward the castle's ground level and moat.
+  - Flanking sides (east/west): **moderate 20–30%** — merging into the surrounding rolling terrain.
 
 ### Terrain Geometry
 
-- **Contour patterns:** Concentric near-elliptical contours around the castle mound, radiating outward and flattening into the surrounding meadow. The mound is roughly circular in plan with an estimated base diameter of ~60–80m.
-- **Ridge lines:** A subtle ridge extends from the left background hills toward the castle area. A separate higher ridge/mountain is visible at the far right background.
-- **Saddle points:** A low saddle exists between the castle mound and the flanking hills to the left and right, where the terrain dips before rising again — these valleys form natural approach corridors.
-- **Plateaus:** The foreground sandy area is essentially a small flat plateau or terrace at the base of the approach, approximately 20m × 30m.
+- **Contour patterns:** Concentric near-elliptical contours around the foreground hill, radiating outward and flattening into the surrounding meadow. The hill is roughly elliptical in plan with an estimated base diameter of ~60–80m. Behind the hill, the terrain drops back to near-foreground level where the castle sits.
+- **Ridge lines:** The foreground hill forms a prominent ridge that visually separates the approach area from the castle grounds. A subtle ridge extends from the left background hills. A separate higher ridge/mountain is visible at the far right background.
+- **Saddle points:** Low saddles exist between the foreground hill and the flanking hills to the left and right — these form natural corridors to walk around the hill toward the castle.
+- **Plateaus:** The foreground sandy area is essentially a small flat plateau or terrace at the base of the hill, approximately 20m × 30m. The castle grounds behind the hill form a second, larger flat area at approximately the same elevation.
 
 ### Surface Composition & Ground Materials
 
 | Surface | Location | Approximate Coverage | Hex Color (est.) |
 |---|---|---|---|
-| Short-mown grass (lush green) | Castle mound, surrounding hills | ~55% | `#4CAF50` to `#66BB6A` |
+| Short-mown grass (lush green) | Foreground hill, castle grounds, surrounding hills | ~55% | `#4CAF50` to `#66BB6A` |
 | Sandy/packed earth | Foreground plaza, path approaches | ~20% | `#D4A84B` to `#C8A44A` |
-| Water (moat) | Encircling the castle base | ~5% | `#2196F3` to `#42A5F5` |
+| Water (moat) | Deep trench encircling the castle base | ~5% | `#2196F3` to `#42A5F5` |
 | Dirt path | Approach road from foreground | ~5% | `#B8943D` to `#C49E52` |
 | Tree canopy (overhead view of ground coverage) | Scattered across hills | ~10% | `#2E7D32` to `#388E3C` |
 | Distant blue-grey (sky-terrain merge) | Background mountains/horizon | ~5% | `#90CAF9` to `#A5C8E0` |
@@ -194,24 +198,26 @@
 ### Natural Landforms
 
 - **Hills/mounds:**
-  - **Castle mound (central):** Dome-shaped, ~6–8m rise, ~60–80m base diameter. Symmetrical, artificially graded. Top is flattened to accommodate the castle footprint (~30m × 22m).
-  - **Left flanking hill:** Elongated dome, ~10–14m rise above foreground, extends behind the castle to the north-west. Approximately 80–100m visible extent.
+  - **Foreground hill (central):** Dome-shaped, ~8–10m rise above the foreground plaza, ~60–80m base diameter. Symmetrical, grass-covered. This hill stands **between** Mario and the castle — the castle is visible behind/above its crest. The hill is a separate landform; the castle does not sit on it.
+  - **Left flanking hill:** Elongated dome, ~10–14m rise above foreground, extends to the north-west. Approximately 80–100m visible extent.
   - **Right flanking hill:** Steeper, taller — part of a larger ridge/mountain system visible in the background. ~20–30m rise. Extends beyond the image frame to the north-east.
   - **Far-left slope (partially visible):** A steep sandy/brown slope at the extreme left edge, possibly a cliff face or excavated hillside. Slope angle ~35–45°. Surface appears sandy/loam rather than grass.
 - **Water features:**
-  - **Moat:** Artificial water channel, ~4–6m wide, ~1.5–2.0m deep (estimated). Encircles the castle mound. Water is calm, no visible current. Fed by unknown source — possibly spring-fed or connected to a larger water body behind the castle.
+  - **Moat:** A deeply excavated medieval defensive trench, ~4–6m wide, cut ~4–6m **below** the surrounding ground level. The water surface sits well below grade, creating a formidable defensive barrier. Steep, near-vertical stone-lined walls drop from ground level to the water. The moat encircles the castle at its base. Water is calm, no visible current. Fed by unknown source — possibly spring-fed or connected to a larger water body.
   - No rivers, streams, or waterfalls visible in the foreground area.
 
 ### Constructed Terrain Features
 
-- **Castle mound / motte:** The most significant constructed terrain element. The castle sits atop a classic motte — a raised earthen platform with graded slopes on all sides. The mound is covered in maintained grass with no exposed soil, suggesting mature, stabilized construction.
-  - **Mound profile:** Truncated dome / bell curve profile in cross-section.
-  - **Mound top area:** ~35m × 25m — just large enough for the castle footprint plus a ~2–3m perimeter.
-  - **Side slopes:** 20–35% gradient, varying by face.
-- **Retaining / moat walls:** The moat has steep, near-vertical embankments (~75–85° face angle) on the castle side, suggesting hidden stone retaining walls below the waterline. The outer moat bank is more gradual (~30–40°).
-- **Bridge approach embankment:** A graded ramp/causeway leads from the foreground sandy area up to the bridge. Gradient ~5–8%. Width ~4–5m. Appears to be compacted earth with a sandy surface.
+- **Foreground hill:** The most prominent terrain feature in the approach view. This natural or lightly graded hill stands between Mario's position and the castle, ~8–10m high. Its crest partially obscures the castle's lower walls, with the upper structure (tower, turrets, roofline) rising dramatically above the hilltop.
+  - **Hill profile:** Dome / bell curve profile in cross-section.
+  - **Base area:** ~60–80m diameter.
+  - **Side slopes:** 15–40% gradient, varying by face (gentler on the approach side, steeper toward the castle).
+- **Excavated moat (defensive trench):** The most significant constructed terrain modification. A deep trench ~4–6m wide and ~4–6m deep is cut into the ground around the castle perimeter, well below the surrounding grade. Both inner and outer walls are steep, near-vertical (~75–85° face angle), lined with stone retaining walls. The water level sits ~4–6m below the ground surface — a true medieval defensive moat.
+  - **Inner moat wall:** Near-vertical stone, rising from waterline to castle ground level.
+  - **Outer moat wall:** Near-vertical stone, rising from waterline to surrounding grade.
+- **Bridge:** Spans the deep moat trench from the surrounding grade level across to the castle entrance. The bridge deck is approximately level, but the drop to the water below is ~4–6m — a significant defensive gap.
 - **Paths/trails:**
-  - A main approach path runs from the foreground center toward the bridge. Width ~3–4m, sandy/packed earth surface. Gradient ~3–5% (nearly level).
+  - A main approach path runs from the foreground plaza, around or over the hill, toward the bridge and castle. Width ~3–4m, sandy/packed earth surface.
   - A secondary path branches left toward a signpost/bulletin board.
 
 ### Vegetation & Ground Cover
@@ -219,7 +225,7 @@
 - **Trees:**
   - **Type:** Stylized deciduous trees with spherical/lollipop-shaped canopies. Broad, round crown shape suggests ornamental or parkland species (oak, maple, or plane tree equivalent).
   - **Dimensions:** Height ~5–7m, canopy diameter ~3–4m, trunk diameter ~0.3–0.4m. Single straight trunk with crown starting at ~2.5–3.0m height.
-  - **Placement pattern:** Semi-random organic distribution, clustered on the flanking hillsides. ~8–12 trees visible. Spacing ~8–15m apart. No trees on the castle mound itself — clear zone maintained around the fortification (historically accurate to real castle design for defensive sightlines).
+  - **Placement pattern:** Semi-random organic distribution, clustered on the flanking hillsides and the foreground hill. ~8–12 trees visible. Spacing ~8–15m apart. No trees on the castle grounds immediately around the moat — clear zone maintained around the fortification (historically accurate to real castle design for defensive sightlines).
   - **Tree colors:** Dark green canopy (`#2E7D32`), brown trunk (`#5D4037`). One tree in the left foreground shows slightly lighter green, possibly a different species or sun angle.
 - **Grass:**
   - Covers all terrain surfaces except the sandy areas and water.
@@ -232,25 +238,27 @@
 
 This is the critical analysis dimension for 3D reconstruction:
 
-- **Siting strategy:** The castle occupies the **apex of the tallest constructed landform** in the immediate area, but is **not** on the highest natural point — the flanking hills rise higher. This creates a "nestled" effect where the castle is prominent but embraced by the surrounding landscape.
-- **Foundation exposure:** No foundation is exposed — the castle walls appear to rise directly from the grass-covered mound surface. This implies the mound was built up around and against the foundation, or the foundation is buried within the mound (typical motte-and-bailey construction).
+- **Siting strategy:** The castle sits on relatively level ground **behind** the foreground hill, not on top of it. From Mario's perspective in the foreground, first the green hill rises ~8–10m, and beyond/behind it the castle sits at approximately the same elevation as Mario. The castle's upper structure (tower, turrets, roofline) is visible above the hill's crest, creating a dramatic reveal as the player approaches and crests the hill.
+- **Depth layering:** The scene reads as a layered composition: foreground plaza → foreground hill → castle grounds (behind hill) → flanking hills → distant mountains. The hill acts as a visual screen that builds anticipation.
+- **Foundation exposure:** No foundation is exposed — the castle walls rise from the ground level behind the hill. The deep moat trench is the primary terrain feature at the castle's base.
 - **Grading around structure:**
-  - **Positive drainage:** The mound surface slopes away from the castle walls at ~10–15% gradient, directing surface water toward the moat on all sides. This is correct drainage practice.
-  - The moat acts as the primary collection channel for all surface runoff from the mound.
-- **Integration quality:** **High** — the castle and mound read as a unified composition. The green grass visually merges the man-made mound with the natural surrounding hills, creating a harmonious landscape. The castle doesn't dominate but rather crowns the terrain.
+  - **Positive drainage:** The ground around the castle slopes gently toward the moat, directing surface water into the deep defensive trench on all sides.
+  - The deeply excavated moat acts as the primary collection channel for all surface runoff.
+- **Integration quality:** **High** — the foreground hill partially frames and reveals the castle, creating a dramatic compositional effect. The castle emerges from behind the natural landscape rather than dominating it from above.
 - **Approach sequence (processional):**
   1. Sandy plaza (flat, open — gathering/orientation space) → elevation 0m
-  2. Gentle path approach (slight rise, ~3–5%) → elevation +0.5m
-  3. Bridge crossing over moat (psychological threshold — crossing water) → elevation +1.5 to +2.5m
-  4. Castle entrance arch (arrival — enclosed, shadowed) → elevation +2.5 to +3.0m
-  - Total elevation gain on approach: **~3.0m over ~30m horizontal distance** = average gradient of **10%** (1:10)
+  2. Hill ascent (climbing the foreground hill, ~15–25% grade) → elevation +8 to +10m at crest
+  3. Hill descent (down the far side toward the castle, ~25–40% grade) → elevation returns to ~0 to +2m
+  4. Bridge crossing over deep moat (dramatic threshold — looking down ~4–6m to water below) → elevation ~0 to +1m
+  5. Castle entrance arch (arrival — enclosed, shadowed) → elevation ~+0.5 to +1.5m
+  - Total elevation change on approach: **up ~10m over the hill, then back down ~8–10m**, arriving at approximately the starting elevation
 
 ### Drainage & Hydrology
 
-- **Surface flow:** All terrain surfaces slope away from the castle, with the moat as the primary interceptor. Sheet flow radiates outward from the mound crest.
-- **Moat function:** Dual purpose — defensive barrier and stormwater collection. The moat likely overflows at the lowest point to a natural drainage channel behind the castle (not visible).
-- **Erosion evidence:** None — the grass cover is complete and intact, providing full erosion protection on all slopes. The sandy foreground area shows no rilling or gullying.
-- **Water table indicators:** The moat holds water at a consistent level, suggesting a high water table or continuous supply. The lush green grass further indicates adequate soil moisture.
+- **Surface flow:** Terrain surfaces around the castle slope gently toward the moat trench. The foreground hill sheds water both toward Mario's plaza and toward the castle grounds behind.
+- **Moat function:** Triple purpose — deep defensive barrier (~4–6m below grade), stormwater collection basin, and psychological deterrent. The deeply excavated trench concentrates all runoff from the surrounding terrain. The moat likely overflows at the lowest point to a natural drainage channel (not visible).
+- **Erosion evidence:** None — the grass cover is complete and intact, providing full erosion protection on all slopes. The sandy foreground area shows no rilling or gullying. The stone-lined moat walls prevent erosion of the trench sides.
+- **Water table indicators:** The deeply excavated moat intersects the water table, keeping it permanently filled. The lush green grass further indicates adequate soil moisture throughout the site.
 
 ### Terrain Profile for 3D Reconstruction
 
@@ -258,21 +266,23 @@ A cross-section along the primary approach axis (south to north through the cast
 
 ```
 Elevation (m)
-   35 |                                        ▲ Castle tower peak
-      |                                        |
-   20 |                                   ┌────┘
-      |                                   | Castle
-   15 | ·····hill····                     | main body         ····hill·····
-      |            ·····                  |              ·····
-   10 |                 ····         ┌────┘         ····
-      |                     ···     | Mound    ···
-    5 |                        ·· ──┘      ──··
-      |                         ╱  moat   ╲
-    0 |  ═══sandy plaza═══  ──bridge──  ═══moat═══
-      |
-   -2 |                      ~~~water~~~
-      └──────────────────────────────────────────────── Distance (m)
-        0    10    20    30    40    50    60    70    80
+   35 |                                                    ▲ Castle tower peak
+      |                                                    |
+   20 |                                               ┌────┘
+      |                                               | Castle
+   15 |                                               | main body    ····hill····
+      |                                               |          ····
+   10 |            ▲ Hill crest                   ┌────┘     ····
+      |          ·· ··                            |
+    5 |        ··     ··                          |
+      |      ··         ··                        |
+    0 | ═══plaza═══       ··══castle ground══bridge══         ····flanking····
+      |                                     │      │
+   -3 |                                     │ moat │
+   -5 |                                     │~~~~~~│  ← water level
+   -6 |                                     └──────┘  ← moat bottom
+      └────────────────────────────────────────────────────────── Distance (m)
+        0    10    20    30    40    50    60    70    80   90   100
 ```
 
 ### Key Terrain Dimensions for Game Engine
@@ -280,20 +290,24 @@ Elevation (m)
 | Terrain Element | Dimension | Notes |
 |---|---|---|
 | Total terrain extent (visible) | ~200m × 150m | Main playable area |
-| Castle mound base diameter | 60–80m | Circular in plan |
-| Castle mound height | 6–8m | Above surrounding grade |
-| Castle mound top (flat area) | 35m × 25m | Castle footprint + perimeter |
-| Moat width | 4–6m | Encircling, constant width |
-| Moat depth | 1.5–2.0m | Below surrounding grade |
-| Sandy plaza area | ~20m × 30m | Flat foreground area |
-| Approach path length | ~30m | From plaza to bridge |
+| Foreground hill base diameter | 60–80m | Elliptical in plan, between Mario and castle |
+| Foreground hill height | 8–10m | Above foreground plaza level |
+| Castle grounds (behind hill) | ~50m × 40m | Flat area at approx. plaza elevation |
+| Castle footprint | ~35m × 25m | Castle building + perimeter |
+| Moat width | 4–6m | Encircling castle, constant width |
+| Moat depth below grade | 4–6m | Deeply excavated medieval defensive trench |
+| Moat water depth | 1.5–2.0m | Water at bottom of trench |
+| Sandy plaza area | ~20m × 30m | Flat foreground area (Mario's start) |
+| Approach path length | ~60–70m | From plaza, over hill, to bridge |
 | Approach path width | 3–4m | Sandy surface |
-| Bridge length | 6–8m | Spanning moat |
+| Bridge length | 6–8m | Spanning moat at ground level |
+| Bridge height above water | 4–6m | Drop to moat water below |
 | Left hill height | 10–14m | Above foreground level |
 | Right ridge height | 20–30m | Taller, extends off-screen |
 | Tree height | 5–7m | Scattered on hills |
 | Tree canopy diameter | 3–4m | Spherical/lollipop shape |
-| Foreground-to-entrance elevation gain | ~3.0m | Over ~30m distance |
+| Foreground-to-hill-crest elevation | ~8–10m | Over ~30m horizontal distance |
+| Hill-crest-to-castle elevation drop | ~8–10m | Down the far side of the hill |
 | Far-left slope angle | 35–45° | Exposed sandy face |
 
 **Confidence: High** (foreground and mid-ground), **Medium** (background hills, dimensions beyond ~100m from camera).
@@ -313,9 +327,9 @@ Elevation (m)
 - **Moat:** A water-filled moat approximately 4–6m wide encircles the castle base. The water appears calm and blue.
 
 ### Grading & Levels
-- The castle sits atop a prominent raised mound, approximately 6–8m above the surrounding terrain.
-- The terrain slopes gently away from the castle in all directions.
-- The bridge provides the primary level change — rising approximately 1–2m from the path to the entrance.
+- The castle sits on level ground behind the foreground hill, at approximately the same elevation as Mario's foreground plaza.
+- A prominent green hill (~8–10m high) rises between Mario and the castle, partially obscuring the castle's lower walls from the approach.
+- The moat is a deeply excavated trench (~4–6m below grade) encircling the castle — the bridge spans this deep gap at ground level, with the water far below.
 
 ### Site Features
 - **Bridge:** Timber construction, approximately 6–8m span, 3–4m width. Features timber railings/fencing on both sides. Appears to be a simple beam bridge with timber deck planking.
@@ -404,7 +418,7 @@ Elevation (m)
 - **Egress:** Only one visible entrance/exit (the main arch). For a building of this size, at minimum two remote exits would be required. Corner turret stairs may contain secondary exits on the rear elevation (not visible).
 - **Barrier-free access:** The bridge approach has a slight gradient but no visible handrails or tactile indicators. The entrance arch appears to be at grade level — potentially accessible.
 - **Fall protection:** No visible parapets or guardrails on any roof surface. The turret flags are on unprotected roof peaks.
-- **Moat:** Presents a significant fall hazard with no visible barriers or fencing at the water's edge.
+- **Moat:** Presents an extreme fall hazard — the ~4–6m vertical drop from ground level to the water surface has no visible barriers, fencing, or guardrails at the edge.
 
 **Confidence: Low** — limited to front elevation observation only.
 
@@ -416,7 +430,7 @@ Elevation (m)
 - **Strong iconic identity:** The bilateral symmetry, central tower, corner turrets, and bold color palette create an immediately recognizable and memorable silhouette.
 - **Proportional harmony:** The ratio of tower height to main body height (~2:1) and the balanced placement of turrets create visual stability and grandeur.
 - **Material clarity:** The simple two-material palette (grey stone + terracotta tile) is clean and effective. The stained-glass window provides a focal point without overwhelming the composition.
-- **Siting:** Elevated position on the mound with moat creates commanding presence. The approach sequence — path, bridge, arch — creates a compelling processional entry experience.
+- **Siting:** Positioned behind the foreground hill with a deeply excavated defensive moat creates a dramatic reveal as the player crests the hill. The approach sequence — climb hill, descend toward castle, cross bridge over deep moat, enter arch — creates a compelling processional entry experience.
 
 ### Potential Concerns
 - **Single point of entry:** Only one visible entrance creates egress and circulation issues.
@@ -436,7 +450,7 @@ For implementation in the game engine, the following key proportions should be m
 | Main roof | 30m | 8m rise | 22m |
 | Entrance arch | 3.5m | 4m | 1.5m deep |
 | Bridge | 3.5m | 0.3m deck | 7m span |
-| Moat | — | 2m deep | 5m wide |
+| Moat | — | 4–6m deep (below grade) | 5m wide |
 | Stained glass window | 3m | 5m | — |
 | Circular windows | 1.2m dia. | — | — |
 

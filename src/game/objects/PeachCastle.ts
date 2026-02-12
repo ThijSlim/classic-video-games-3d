@@ -42,14 +42,71 @@ export class PeachCastle extends GameObject {
       metalness: 0.1, roughness: 0.3,
     });
 
-    // === 2. Moat Water Ring ===
-    const moat = new THREE.Mesh(
+    // === 2. Moat — Deeply excavated medieval trench ===
+    // Outer trench wall (stone-lined)
+    const outerWall = new THREE.Mesh(
+      new THREE.CylinderGeometry(19, 19, 5, 32, 1, true),
+      stoneMat,
+    );
+    outerWall.position.set(0, -2.5, 0);
+    outerWall.castShadow = true;
+    outerWall.receiveShadow = true;
+    group.add(outerWall);
+
+    // Inner trench wall
+    const innerWall = new THREE.Mesh(
+      new THREE.CylinderGeometry(15, 15, 5, 32, 1, true),
+      stoneMat,
+    );
+    innerWall.position.set(0, -2.5, 0);
+    innerWall.castShadow = true;
+    innerWall.receiveShadow = true;
+    group.add(innerWall);
+
+    // Water surface at bottom of trench
+    const moatWater = new THREE.Mesh(
       new THREE.RingGeometry(15, 19, 32),
       waterMat,
     );
-    moat.position.set(0, -0.05, 0);
-    moat.rotation.x = -Math.PI / 2;
-    group.add(moat);
+    moatWater.position.set(0, -5, 0);
+    moatWater.rotation.x = -Math.PI / 2;
+    group.add(moatWater);
+
+    // Dark moat bottom beneath water
+    const moatBottom = new THREE.Mesh(
+      new THREE.RingGeometry(15, 19, 32),
+      darkMat,
+    );
+    moatBottom.position.set(0, -5.5, 0);
+    moatBottom.rotation.x = -Math.PI / 2;
+    group.add(moatBottom);
+
+    // Moat bottom physics (catches Mario if he falls in)
+    const moatBottomPhysics = new CANNON.Body({
+      mass: 0,
+      shape: new CANNON.Cylinder(19, 19, 0.3, 16),
+      position: new CANNON.Vec3(px, py - 5.5, pz),
+    });
+    this.engine.addPhysicsBody(moatBottomPhysics);
+    this.bodies.push(moatBottomPhysics);
+
+    // === Castle courtyard — walkable platform inside moat ===
+    const courtyardMat = new THREE.MeshStandardMaterial({ color: 0xC8A44A, roughness: 0.9 });
+    const courtyard = new THREE.Mesh(
+      new THREE.CylinderGeometry(14.5, 14.5, 0.5, 32),
+      courtyardMat,
+    );
+    courtyard.position.set(0, -0.25, 0);
+    courtyard.receiveShadow = true;
+    group.add(courtyard);
+
+    const courtyardPhysics = new CANNON.Body({
+      mass: 0,
+      shape: new CANNON.Cylinder(14.5, 14.5, 0.5, 16),
+      position: new CANNON.Vec3(px, py - 0.25, pz),
+    });
+    this.engine.addPhysicsBody(courtyardPhysics);
+    this.bodies.push(courtyardPhysics);
 
     // === 3. Main Body ===
     const mainBody = new THREE.Mesh(
@@ -187,19 +244,18 @@ export class PeachCastle extends GameObject {
     archSurround.rotation.z = Math.PI;
     group.add(archSurround);
 
-    // === 8. Bridge ===
-    // Deck
+    // === 8. Bridge (spans full moat width) ===
     const bridgeDeck = new THREE.Mesh(
-      new THREE.BoxGeometry(2.5, 0.3, 5),
+      new THREE.BoxGeometry(2.5, 0.3, 13),
       woodMat,
     );
-    bridgeDeck.position.set(0, 2.15, 10.5);
+    bridgeDeck.position.set(0, 2.15, 14.5);
     bridgeDeck.castShadow = true;
     bridgeDeck.receiveShadow = true;
     group.add(bridgeDeck);
 
-    // Railing posts (5 per side, 10 total)
-    const postZPositions = [8.5, 9.5, 10.5, 11.5, 12.5];
+    // Railing posts (13 per side)
+    const postZPositions = [8.5, 9.5, 10.5, 11.5, 12.5, 13.5, 14.5, 15.5, 16.5, 17.5, 18.5, 19.5, 20.5];
     for (const side of [-1.2, 1.2]) {
       for (const zPos of postZPositions) {
         const post = new THREE.Mesh(
@@ -211,21 +267,21 @@ export class PeachCastle extends GameObject {
       }
     }
 
-    // Railing beams (2 horizontal)
+    // Railing beams (full length)
     for (const side of [-1.2, 1.2]) {
       const beam = new THREE.Mesh(
-        new THREE.BoxGeometry(0.08, 0.08, 5),
+        new THREE.BoxGeometry(0.08, 0.08, 13),
         woodMat,
       );
-      beam.position.set(side, 2.9, 10.5);
+      beam.position.set(side, 2.9, 14.5);
       group.add(beam);
     }
 
     // Bridge physics
     const bridgePhysics = new CANNON.Body({
       mass: 0,
-      shape: new CANNON.Box(new CANNON.Vec3(1.25, 0.15, 2.5)),
-      position: new CANNON.Vec3(px, py + 2.15, pz + 10.5),
+      shape: new CANNON.Box(new CANNON.Vec3(1.25, 0.15, 6.5)),
+      position: new CANNON.Vec3(px, py + 2.15, pz + 14.5),
     });
     this.engine.addPhysicsBody(bridgePhysics);
     this.bodies.push(bridgePhysics);

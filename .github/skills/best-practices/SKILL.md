@@ -230,11 +230,19 @@ When adding a large structure that replaces multiple smaller objects:
 ## Terrain & Structure Integration (Added 2026-02-12)
 
 ### Terrain-Structure Integration Pattern
-When placing a structure (e.g., castle) on sculpted terrain:
-1. **Remove the structure's internal base** — If the structure previously had its own earthen mound or base mesh, remove it; the terrain now provides that
-2. **Raise the structure's config position** — Set `position.y` to the terrain mound top (e.g., `y: 4` to sit atop a mound peaking at y=4.0)
-3. **Physics auto-shifts** — If the structure's physics bodies use `config.position` offsets, they automatically move with the new Y value
+When placing a structure (e.g., castle) relative to sculpted terrain:
+1. **Ground-level behind foreground hill** — Place the structure at y=0 behind a foreground hill that partially occludes it, creating depth and a sense of scale (e.g., castle at z=-50 behind hill at z=-12)
+2. **Or atop a terrain mound** — Set `position.y` to the mound top height so the structure sits on the mound
+3. **Physics auto-shifts** — If the structure's physics bodies use `config.position` offsets, they automatically move with the new position
 4. **Verify bridge/entrance alignment** — Ensure connecting elements (bridges, ramps) still meet the terrain at the correct height
+
+### Foreground Hill for Depth
+Place a prominent concentric-cylinder hill between the player and a distant structure to:
+- Create visual depth and a sense of journey
+- Partially occlude the structure from the spawn point, rewarding exploration
+- Provide additional terrain for gameplay (coins, enemies on the hill)
+
+**Layout reference:** Mario spawns at z=0, foreground hill at z=-12, castle at z=-50. The hill is ~8m tall (10 layers), partially hiding the castle behind it.
 
 ### Layered Ground Planes
 Use multiple overlapping ground platforms at different Y levels instead of a single flat plane:
@@ -259,8 +267,37 @@ this.createTree(x, z, baseY); // baseY matches the hill layer height at that pos
 ```
 Estimate `baseY` from the hill layer radii — a tree at distance D from center sits at the Y of the outermost layer whose radius ≥ D.
 
+### Object Relocation When Terrain Changes
+When adding or restructuring terrain features, all game objects in the affected Z-range must be checked and relocated:
+1. **Identify the collision zone** — Determine the X/Z footprint and height of the new terrain (e.g., foreground hill at z=-12, radius 20)
+2. **Find overlapping objects** — Check coins, goombas, floating platforms, and decorations within that footprint
+3. **Relocate or remove** — Move objects outside the terrain feature, or respace them to avoid overlap
+4. **Test walkability** — Verify Mario can still reach relocated objects without getting stuck
+
+**Example:** When adding a foreground hill at z=-12 with radius 20, the floating platform at z=-12 and coins near z=-12 were moved to z=12 (positive Z, away from the hill).
+
+### Physics Catch Bodies for Pits and Trenches
+Whenever you excavate terrain (moats, pits, gaps), always add a thin physics body at the bottom:
+- Prevents Mario from falling through the world into the void
+- Use a 0.3-unit thick cylinder/box spanning the full width of the excavation
+- Position at the lowest visual point (e.g., below the water surface)
+
+### Bridge and Connector Sizing
+When surrounding terrain features change size, connectors (bridges, ramps, walkways) must be resized to match:
+- Bridge length should span the full gap from structure exit to solid ground
+- Add railing posts at regular intervals (every 1 unit) for visual fidelity
+- Physics body must cover the full bridge length to remain walkable
+
+**Example:** When the moat was widened from ~5 to ~13 units, the bridge was extended from 5→13 game units, railing posts increased from 5→13 per side.
+
+### Open-Ended Cylinders for Walls
+`CylinderGeometry(r, r, h, segments, 1, true)` — the `true` parameter removes top/bottom caps, creating tube walls that can be seen through from inside. Useful for:
+- Moat/trench walls (see stone walls from inside the trench)
+- Hollow towers or fortress walls
+- Any ring-shaped enclosure
+
 ### Terrain Building Method Organization
 Keep terrain construction in a dedicated `buildTerrain()` method called from `buildLevel()`. This separates terrain from gameplay objects (platforms, coins, enemies) and keeps `buildLevel()` readable.
 
 *Last updated: 2026-02-12*
-*Updated by: learning agent — Terrain improvement: concentric cylinder mounds, elliptical hills, layered ground, terrain-structure integration*
+*Updated by: learning agent — Terrain overhaul: foreground hill depth, excavated moat/trench, courtyard disc, catch bodies, object relocation protocol, open-ended cylinders*

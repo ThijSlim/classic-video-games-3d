@@ -73,13 +73,16 @@ export abstract class GameObject {
 
 ### PeachCastle (Large Static Structure) — Added 2026-02-12, Updated 2026-02-12
 - **File:** `src/game/objects/PeachCastle.ts`
-- **Config:** `PeachCastleConfig { position: { x, y, z: number } }` — position y=4 to sit atop terrain mound
-- **Visual:** ~47 meshes — moat ring, main body box, hip roof (4-sided cone), central tower + spire, 4 corner turrets with conical roofs, entrance arch (box+half-cylinder+half-torus), bridge with railing posts/beams, stained-glass window with gold frame, 8 circular windows. Earthen mound removed (terrain provides it)
-- **Physics:** 7 `CANNON.Body` instances (mass=0, static): main body box, central tower cylinder, 4 turret cylinders, bridge box. Uses **Multiple Physics Bodies pattern** (see below)
-- **Materials:** 8 shared materials reused across all meshes (stone, roof, wood, water, gold, dark, flag, glass)
+- **Config:** `PeachCastleConfig { position: { x, y, z: number } }` — position y=0 at ground level behind foreground hill
+- **Visual:** ~50+ meshes — excavated moat trench (outer/inner stone walls via open-ended cylinders, water ring at y=-5, dark bottom), courtyard disc (r=14.5), main body box, hip roof (4-sided cone), central tower + spire, 4 corner turrets with conical roofs, entrance arch (box+half-cylinder+half-torus), extended bridge (13 units, 13 railing posts per side), stained-glass window with gold frame, 8 circular windows
+- **Physics:** 9 `CANNON.Body` instances (mass=0, static): main body box, central tower cylinder, 4 turret cylinders, bridge box, courtyard disc, moat bottom catch body. Uses **Multiple Physics Bodies pattern** (see below)
+- **Materials:** 9 shared materials reused across all meshes (stone, roof, wood, water, gold, dark, flag, glass, courtyard)
 - **Behavior:** Static structure, flags animated with sine wave in `update()`
 - **Pattern:** Multi-body static structure with animated decorations
 - **Scale reference:** 0.75 game units per real-world meter (entrance arch = 3 game units for 4m real arch)
+- **Moat:** Deeply excavated medieval trench — two open-ended cylinders (r=19 outer, r=15 inner) for stone walls, water ring at y=-5, dark disc at y=-5.5, thin cylinder catch body at bottom for physics
+- **Courtyard:** CylinderGeometry disc (r=14.5, h=0.5) inside moat ring, with matching physics body — gives Mario a walkable surface inside the moat
+- **Bridge:** Extended from 5→13 units to span the full moat width (z=8 to z=21)
 
 ---
 
@@ -198,6 +201,73 @@ update(deltaTime: number): void {
 ```
 **When to use:** Static objects that need subtle motion for visual interest (flags, torches, spinning gears). The base structure doesn't move, only the decorations.
 
+### Pattern: Excavated Trench / Moat (Added 2026-02-12)
+Create a deeply dug trench around a structure using open-ended cylinders for walls, a water surface ring, and a physics catch body at the bottom:
+```typescript
+// Outer trench wall — open-ended cylinder shows the inside
+const outerWall = new THREE.Mesh(
+  new THREE.CylinderGeometry(19, 19, 5, 32, 1, true), // true = open-ended
+  stoneMat,
+);
+outerWall.position.set(0, -2.5, 0); // Sinks below ground level
+group.add(outerWall);
+
+// Inner trench wall
+const innerWall = new THREE.Mesh(
+  new THREE.CylinderGeometry(15, 15, 5, 32, 1, true),
+  stoneMat,
+);
+innerWall.position.set(0, -2.5, 0);
+group.add(innerWall);
+
+// Water surface at bottom of trench
+const moatWater = new THREE.Mesh(
+  new THREE.RingGeometry(15, 19, 32),
+  waterMat, // transparent, opacity: 0.6
+);
+moatWater.position.set(0, -5, 0);
+moatWater.rotation.x = -Math.PI / 2;
+group.add(moatWater);
+
+// Physics catch body — prevents falling through the world
+const moatBottomPhysics = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Cylinder(19, 19, 0.3, 16),
+  position: new CANNON.Vec3(px, py - 5.5, pz),
+});
+```
+**Key technique:** `CylinderGeometry(r, r, h, seg, 1, true)` — the `true` (openEnded) parameter removes the caps, creating tube walls you can see through from inside the trench.
+**When to use:** Moats, excavated rings, defensive trenches, or any annular hole in the terrain.
+
+### Pattern: Walkable Courtyard Disc (Added 2026-02-12)
+A flat cylindrical platform that provides a walkable surface inside a ring-shaped feature (e.g., inside a moat):
+```typescript
+const courtyard = new THREE.Mesh(
+  new THREE.CylinderGeometry(14.5, 14.5, 0.5, 32),
+  courtyardMat,
+);
+courtyard.position.set(0, -0.25, 0);
+group.add(courtyard);
+
+const courtyardPhysics = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Cylinder(14.5, 14.5, 0.5, 16),
+  position: new CANNON.Vec3(px, py - 0.25, pz),
+});
+```
+**When to use:** Any enclosed area that needs a walkable floor — castle courtyards, arena floors, crater interiors. Radius should be slightly smaller than the inner wall radius to avoid z-fighting.
+
+### Pattern: Physics Catch Body (Added 2026-02-12)
+A thin invisible physics body placed at the bottom of a pit or trench to prevent the player from falling through the world:
+```typescript
+const catchBody = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Cylinder(outerRadius, outerRadius, 0.3, 16),
+  position: new CANNON.Vec3(px, py - depth, pz),
+});
+```
+**When to use:** Below moats, pits, gaps in terrain, or anywhere the player might fall below the main ground plane. Use the outer radius of the feature so it catches across the full area.
+
 ---
 
 ## World Integration
@@ -217,35 +287,41 @@ Decorative objects (trees, pipes) are added directly to the scene without being 
 
 World.ts builds terrain via a dedicated `buildTerrain()` method. Terrain elements are added directly to the scene (not tracked as entities) since they're static and don't need `update()` calls.
 
-#### Concentric Cylinder Mound
-Approximate a dome/hill with stacked `CylinderGeometry` layers of decreasing radius:
+#### Concentric Cylinder Mound / Hill
+Approximate a dome/hill with stacked `CylinderGeometry` layers of decreasing radius. Used for both platform mounds and prominent foreground hills:
 ```typescript
-const moundLayers = [
-  { radius: 28, y: 0.4, height: 0.8 },
-  { radius: 24, y: 1.2, height: 0.8 },
-  { radius: 20, y: 2.0, height: 0.8 },
-  { radius: 17, y: 2.8, height: 0.8 },
-  { radius: 14.5, y: 3.4, height: 0.8 },
-  { radius: 13, y: 4.0, height: 0.8 },
+// Foreground hill — 10 layers from r=20 down to r=3, ~8m tall
+const hillLayers = [
+  { radius: 20,  y: 0.4,  height: 0.8 },
+  { radius: 18,  y: 1.2,  height: 0.8 },
+  { radius: 16,  y: 2.0,  height: 0.8 },
+  { radius: 14,  y: 2.8,  height: 0.8 },
+  { radius: 12,  y: 3.6,  height: 0.8 },
+  { radius: 10,  y: 4.4,  height: 0.8 },
+  { radius: 8,   y: 5.2,  height: 0.8 },
+  { radius: 6,   y: 6.0,  height: 0.8 },
+  { radius: 4.5, y: 6.8,  height: 0.8 },
+  { radius: 3,   y: 7.6,  height: 0.8 },
 ];
-for (const layer of moundLayers) {
+for (const layer of hillLayers) {
   const mesh = new THREE.Mesh(
     new THREE.CylinderGeometry(layer.radius, layer.radius, layer.height, 32),
     grassMat,
   );
-  mesh.position.set(0, layer.y, -25);
+  mesh.position.set(0, layer.y, -12);
   mesh.receiveShadow = true;
   engine.addToScene(mesh);
 
   const body = new CANNON.Body({
     mass: 0,
     shape: new CANNON.Cylinder(layer.radius, layer.radius, layer.height, 16),
-    position: new CANNON.Vec3(0, layer.y, -25),
+    position: new CANNON.Vec3(0, layer.y, -12),
   });
   engine.addPhysicsBody(body);
 }
 ```
-**When to use:** Castle mounds, hills, or any terrain that needs a rounded elevated shape with walkable physics.
+**When to use:** Castle mounds, foreground hills, or any terrain that needs a rounded elevated shape with walkable physics.
+**Design tip:** More layers with smaller radius steps = smoother curve. 6 layers for a gentle mound, 10 for a prominent hill.
 
 #### Elliptical Hill via Scale
 Stretch a cylinder on one axis to create an elongated hill. Physics uses `CANNON.Box` with scaled half-extents since `CANNON.Cylinder` doesn't support non-uniform scale:

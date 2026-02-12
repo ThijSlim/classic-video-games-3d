@@ -51,7 +51,7 @@ export class World {
     this.buildTerrain();
 
     // === Peach's Castle ===
-    this.addEntity(new PeachCastle(this.engine, { position: { x: 0, y: 4, z: -25 } }));
+    this.addEntity(new PeachCastle(this.engine, { position: { x: 0, y: 0, z: -50 } }));
 
     // === Floating platforms ===
     const floatingPlatforms = [
@@ -61,7 +61,7 @@ export class World {
       { x: -8, y: 3, z: 8, sx: 3, sy: 0.5, sz: 3, color: 0x8BC34A },
       { x: -14, y: 6, z: 6, sx: 3, sy: 0.5, sz: 3, color: 0x8BC34A },
       { x: -18, y: 9, z: 2, sx: 4, sy: 0.5, sz: 4, color: 0xFFC107 },
-      { x: 0, y: 12, z: -5, sx: 5, sy: 0.5, sz: 5, color: 0xFF5722 },
+      { x: 0, y: 12, z: -12, sx: 5, sy: 0.5, sz: 5, color: 0xFF5722 },
     ];
 
     for (const p of floatingPlatforms) {
@@ -87,7 +87,7 @@ export class World {
       ...Array.from({ length: 8 }, (_, i) => ({
         x: Math.cos(i * Math.PI / 4) * 8,
         y: 1.5,
-        z: Math.sin(i * Math.PI / 4) * 8,
+        z: 14 + Math.sin(i * Math.PI / 4) * 8,
       })),
       // Coins on platforms
       { x: 8, y: 5, z: 5 },
@@ -96,7 +96,7 @@ export class World {
       { x: -8, y: 5, z: 8 },
       { x: -14, y: 8, z: 6 },
       { x: -18, y: 11, z: 2 },
-      { x: 0, y: 14, z: -5 },
+      { x: 0, y: 14, z: -12 },
       // Staircase coins
       ...Array.from({ length: 6 }, (_, i) => ({
         x: -5 + i * 2,
@@ -115,7 +115,7 @@ export class World {
     const goombaPositions = [
       { x: 5, y: 1, z: 5, patrolRadius: 3 },
       { x: -5, y: 1, z: 5, patrolRadius: 4 },
-      { x: 10, y: 1, z: -5, patrolRadius: 3 },
+      { x: 10, y: 1, z: 10, patrolRadius: 3 },
       { x: -15, y: 1, z: 8, patrolRadius: 5 },
     ];
 
@@ -162,51 +162,37 @@ export class World {
     const darkGreenMat = new THREE.MeshStandardMaterial({ color: 0x388E3C, roughness: 0.9 });
     const sandMat = new THREE.MeshStandardMaterial({ color: 0xC8A44A, roughness: 0.95 });
 
-    // === Castle Mound — 6 concentric cylinder layers ===
-    const moundLayers = [
-      { radius: 28, y: 0.4, height: 0.8 },
-      { radius: 24, y: 1.2, height: 0.8 },
-      { radius: 20, y: 2.0, height: 0.8 },
-      { radius: 17, y: 2.8, height: 0.8 },
-      { radius: 14.5, y: 3.4, height: 0.8 },
-      { radius: 13, y: 4.0, height: 0.8 },
+    // === Foreground Hill — 10 concentric cylinder layers ===
+    // Prominent hill between Mario and the castle (behind this hill)
+    const hillLayers = [
+      { radius: 20,  y: 0.4,  height: 0.8 },
+      { radius: 18,  y: 1.2,  height: 0.8 },
+      { radius: 16,  y: 2.0,  height: 0.8 },
+      { radius: 14,  y: 2.8,  height: 0.8 },
+      { radius: 12,  y: 3.6,  height: 0.8 },
+      { radius: 10,  y: 4.4,  height: 0.8 },
+      { radius: 8,   y: 5.2,  height: 0.8 },
+      { radius: 6,   y: 6.0,  height: 0.8 },
+      { radius: 4.5, y: 6.8,  height: 0.8 },
+      { radius: 3,   y: 7.6,  height: 0.8 },
     ];
 
-    for (const layer of moundLayers) {
+    for (const layer of hillLayers) {
       const mesh = new THREE.Mesh(
         new THREE.CylinderGeometry(layer.radius, layer.radius, layer.height, 32),
         grassMat,
       );
-      mesh.position.set(0, layer.y, -25);
+      mesh.position.set(0, layer.y, -12);
       mesh.receiveShadow = true;
       this.engine.addToScene(mesh);
 
       const body = new CANNON.Body({
         mass: 0,
         shape: new CANNON.Cylinder(layer.radius, layer.radius, layer.height, 16),
-        position: new CANNON.Vec3(0, layer.y, -25),
+        position: new CANNON.Vec3(0, layer.y, -12),
       });
       this.engine.addPhysicsBody(body);
     }
-
-    // === Approach Path (Ramp) ===
-    const rampMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(3, 0.3, 15),
-      pathMat,
-    );
-    rampMesh.position.set(0, 1.5, -5);
-    rampMesh.rotation.x = -0.12;
-    rampMesh.castShadow = true;
-    rampMesh.receiveShadow = true;
-    this.engine.addToScene(rampMesh);
-
-    const rampBody = new CANNON.Body({
-      mass: 0,
-      shape: new CANNON.Box(new CANNON.Vec3(1.5, 0.15, 7.5)),
-      position: new CANNON.Vec3(0, 1.5, -5),
-    });
-    rampBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -0.12);
-    this.engine.addPhysicsBody(rampBody);
 
     // === Left Flanking Hill — 4 layers ===
     const leftHillLayers = [
