@@ -225,5 +225,42 @@ When adding a large structure that replaces multiple smaller objects:
 
 ---
 
+---
+
+## Terrain & Structure Integration (Added 2026-02-12)
+
+### Terrain-Structure Integration Pattern
+When placing a structure (e.g., castle) on sculpted terrain:
+1. **Remove the structure's internal base** — If the structure previously had its own earthen mound or base mesh, remove it; the terrain now provides that
+2. **Raise the structure's config position** — Set `position.y` to the terrain mound top (e.g., `y: 4` to sit atop a mound peaking at y=4.0)
+3. **Physics auto-shifts** — If the structure's physics bodies use `config.position` offsets, they automatically move with the new Y value
+4. **Verify bridge/entrance alignment** — Ensure connecting elements (bridges, ramps) still meet the terrain at the correct height
+
+### Layered Ground Planes
+Use multiple overlapping ground platforms at different Y levels instead of a single flat plane:
+| Layer | Size | Y Position | Purpose |
+|-------|------|------------|------------------|
+| Dark earth base | 300×300 | -2.0 | Catch-all, prevents void gaps |
+| Grass field | 200×200 | -0.25 | Main playable area |
+| Sandy plaza | 15×20 | -0.1 | Localized area near spawn |
+
+**Key benefit:** The large base layer at y=-2 prevents the player from falling into the void if they walk off the main grass area.
+
+### Selective Physics on Terrain Hills
+Not every visual terrain layer needs physics. For hills the player won't climb:
+- Add physics only to the bottom 2 layers (walkable base)
+- Skip physics on upper layers (decorative peaks)
+- This reduces physics body count while maintaining visual richness
+
+### Tree Placement on Terrain
+When placing trees on terrain hills, pass `baseY` to set vertical position:
+```typescript
+this.createTree(x, z, baseY); // baseY matches the hill layer height at that position
+```
+Estimate `baseY` from the hill layer radii — a tree at distance D from center sits at the Y of the outermost layer whose radius ≥ D.
+
+### Terrain Building Method Organization
+Keep terrain construction in a dedicated `buildTerrain()` method called from `buildLevel()`. This separates terrain from gameplay objects (platforms, coins, enemies) and keeps `buildLevel()` readable.
+
 *Last updated: 2026-02-12*
-*Updated by: learning agent — PeachCastle multi-body structure, material reuse, scaling patterns*
+*Updated by: learning agent — Terrain improvement: concentric cylinder mounds, elliptical hills, layered ground, terrain-structure integration*

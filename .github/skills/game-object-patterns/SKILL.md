@@ -71,12 +71,12 @@ export abstract class GameObject {
 - **Behavior:** Circular patrol path using sin/cos, walk bob animation
 - **Pattern:** Kinematic enemy with config-driven patrol behavior
 
-### PeachCastle (Large Static Structure) — Added 2026-02-12
+### PeachCastle (Large Static Structure) — Added 2026-02-12, Updated 2026-02-12
 - **File:** `src/game/objects/PeachCastle.ts`
-- **Config:** `PeachCastleConfig { position: { x, y, z: number } }`
-- **Visual:** ~49 meshes — earthen mound, moat ring, main body box, hip roof (4-sided cone), central tower + spire, 4 corner turrets with conical roofs, entrance arch (box+half-cylinder+half-torus), bridge with railing posts/beams, stained-glass window with gold frame, 8 circular windows
-- **Physics:** 8 `CANNON.Body` instances (mass=0, static): mound box, main body box, central tower cylinder, 4 turret cylinders, bridge box. Uses **Multiple Physics Bodies pattern** (see below)
-- **Materials:** 10 shared materials reused across all meshes (stone, roof, wood, water, gold, dark, earth, flag, glass, frame)
+- **Config:** `PeachCastleConfig { position: { x, y, z: number } }` — position y=4 to sit atop terrain mound
+- **Visual:** ~47 meshes — moat ring, main body box, hip roof (4-sided cone), central tower + spire, 4 corner turrets with conical roofs, entrance arch (box+half-cylinder+half-torus), bridge with railing posts/beams, stained-glass window with gold frame, 8 circular windows. Earthen mound removed (terrain provides it)
+- **Physics:** 7 `CANNON.Body` instances (mass=0, static): main body box, central tower cylinder, 4 turret cylinders, bridge box. Uses **Multiple Physics Bodies pattern** (see below)
+- **Materials:** 8 shared materials reused across all meshes (stone, roof, wood, water, gold, dark, flag, glass)
 - **Behavior:** Static structure, flags animated with sine wave in `update()`
 - **Pattern:** Multi-body static structure with animated decorations
 - **Scale reference:** 0.75 game units per real-world meter (entrance arch = 3 game units for 4m real arch)
@@ -212,6 +212,88 @@ for (const pos of positions) {
 ```
 
 Decorative objects (trees, pipes) are added directly to the scene without being tracked as entities.
+
+### Terrain Building (Added 2026-02-12)
+
+World.ts builds terrain via a dedicated `buildTerrain()` method. Terrain elements are added directly to the scene (not tracked as entities) since they're static and don't need `update()` calls.
+
+#### Concentric Cylinder Mound
+Approximate a dome/hill with stacked `CylinderGeometry` layers of decreasing radius:
+```typescript
+const moundLayers = [
+  { radius: 28, y: 0.4, height: 0.8 },
+  { radius: 24, y: 1.2, height: 0.8 },
+  { radius: 20, y: 2.0, height: 0.8 },
+  { radius: 17, y: 2.8, height: 0.8 },
+  { radius: 14.5, y: 3.4, height: 0.8 },
+  { radius: 13, y: 4.0, height: 0.8 },
+];
+for (const layer of moundLayers) {
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(layer.radius, layer.radius, layer.height, 32),
+    grassMat,
+  );
+  mesh.position.set(0, layer.y, -25);
+  mesh.receiveShadow = true;
+  engine.addToScene(mesh);
+
+  const body = new CANNON.Body({
+    mass: 0,
+    shape: new CANNON.Cylinder(layer.radius, layer.radius, layer.height, 16),
+    position: new CANNON.Vec3(0, layer.y, -25),
+  });
+  engine.addPhysicsBody(body);
+}
+```
+**When to use:** Castle mounds, hills, or any terrain that needs a rounded elevated shape with walkable physics.
+
+#### Elliptical Hill via Scale
+Stretch a cylinder on one axis to create an elongated hill. Physics uses `CANNON.Box` with scaled half-extents since `CANNON.Cylinder` doesn't support non-uniform scale:
+```typescript
+const mesh = new THREE.Mesh(
+  new THREE.CylinderGeometry(radius, radius, height, 24),
+  greenMat,
+);
+mesh.position.set(x, y, z);
+mesh.scale.x = 1.5; // Stretch for elliptical shape
+
+const body = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Box(new CANNON.Vec3(radius * 1.5, height / 2, radius)),
+  position: new CANNON.Vec3(x, y, z),
+});
+```
+**Tip:** Scale `.x` for east-west stretch, `.z` for north-south stretch.
+
+#### Rotated Ramp with Physics
+Both the mesh and physics body must rotate by the same angle:
+```typescript
+rampMesh.rotation.x = -0.12;
+rampBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -0.12);
+```
+
+#### Decorative Background Mountains
+Low-poly cones with no physics for distant terrain:
+```typescript
+const mountains = [
+  { x: -70, y: 12.5, z: -90, radius: 40, height: 25, color: 0x66BB6A },
+  { x: 0, y: 15, z: -110, radius: 50, height: 30, color: 0x81C784 },
+];
+for (const mt of mountains) {
+  const mesh = new THREE.Mesh(
+    new THREE.ConeGeometry(mt.radius, mt.height, 6), // 6 sides = low-poly
+    new THREE.MeshStandardMaterial({ color: mt.color, roughness: 0.9 }),
+  );
+  mesh.position.set(mt.x, mt.y, mt.z);
+  engine.addToScene(mesh);
+}
+```
+
+#### Layered Ground Planes
+Use multiple overlapping platforms at different Y levels for visual variety:
+- Dark earth base at y=-2 (300×300) — catch-all, prevents void
+- Grass field at y=-0.25 (200×200) — main playable surface
+- Sandy plaza at y=-0.1 — localized area near spawn
 
 ### World Collision Detection
 

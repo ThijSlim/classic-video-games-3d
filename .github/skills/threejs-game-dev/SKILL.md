@@ -349,3 +349,58 @@ const woodMat  = new THREE.MeshStandardMaterial({ color: 0x8B6914, roughness: 0.
 // ... reuse everywhere
 ```
 **Performance benefit:** Fewer material instances = fewer GPU state changes during rendering. Three.js can batch meshes that share the same material.
+
+### Concentric Cylinder Hill Technique (Added 2026-02-12)
+Approximate smooth hills/mounds using stacked `CylinderGeometry` layers with decreasing radii. Each layer has its own `CANNON.Cylinder` physics body.
+
+**Visual segments:** Use 32 radial segments for a smooth visual appearance on large terrain cylinders. Use 16 segments for the physics `CANNON.Cylinder` — physics doesn't need visual fidelity.
+
+**Layer sizing:** 6-8 layers with 0.8 gu height each, radius decreasing ~3-5 units per step. Top radius ~50% of bottom radius creates a dome-like profile.
+
+**Performance note:** Each layer adds one physics body. For large hills that the player won't walk on, use `hasPhysics: false` on upper layers to save physics computation:
+```typescript
+for (const layer of hillLayers) {
+  // Always add visual mesh
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(layer.radius, layer.radius, layer.height, 24), mat);
+  engine.addToScene(mesh);
+
+  // Only add physics where needed
+  if (layer.hasPhysics) {
+    const body = new CANNON.Body({ mass: 0, shape: new CANNON.Cylinder(layer.radius, layer.radius, layer.height, 16) });
+    engine.addPhysicsBody(body);
+  }
+}
+```
+
+### Non-Uniform Cylinder Scaling for Physics (Added 2026-02-12)
+`CANNON.Cylinder` doesn't support non-uniform scaling. When stretching a `THREE.CylinderGeometry` via `mesh.scale.x` or `mesh.scale.z` for elliptical shapes, approximate the physics with a `CANNON.Box`:
+```typescript
+// Visual: elliptical cylinder
+mesh.scale.x = 1.5;
+
+// Physics: box approximation with scaled half-extent
+const body = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Box(new CANNON.Vec3(radius * scaleX, height / 2, radius)),
+});
+```
+This is acceptable because the player won't notice the box vs cylinder difference for large terrain features.
+
+### Rotated Physics Body Quaternion (Added 2026-02-12)
+When rotating a mesh (e.g., for a ramp), the cannon-es body must match. Use `setFromAxisAngle` on the body's quaternion:
+```typescript
+// Visual rotation
+mesh.rotation.x = -0.12;
+
+// Physics rotation (must match)
+body.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -0.12);
+```
+**Axis mapping:** Three.js `rotation.x` → cannon-es axis `(1, 0, 0)`, `rotation.y` → `(0, 1, 0)`, `rotation.z` → `(0, 0, 1)`. The angle value is the same.
+
+### Background Decorative Geometry (Added 2026-02-12)
+Distant terrain features (mountains, slopes) should be:
+- **Low-poly:** 6-sided cones for mountains, simple boxes for slopes
+- **No physics:** Saves computation; player won't reach them
+- **Large scale:** Radii of 30-50 units, heights of 20-35 units
+- **Muted colors:** Slightly lighter/bluer greens for atmospheric perspective (`0x66BB6A`, `0x81C784`, `0x90CAF9`)
+- **Partially buried:** Set Y position to half-height so the base is at ground level
