@@ -36,36 +36,18 @@ export class PeachCastle extends GameObject {
     const waterMat = new THREE.MeshStandardMaterial({ color: 0x2196F3, transparent: true, opacity: 0.6, roughness: 0.1 });
     const goldMat = new THREE.MeshStandardMaterial({ color: 0xDAA520, metalness: 0.7, roughness: 0.3 });
     const darkMat = new THREE.MeshStandardMaterial({ color: 0x1A1A1A });
-    const earthMat = new THREE.MeshStandardMaterial({ color: 0x6B4226, roughness: 0.95, metalness: 0.0 });
     const flagMat = new THREE.MeshStandardMaterial({ color: 0xFF0000, side: THREE.DoubleSide });
     const glassMat = new THREE.MeshStandardMaterial({
       color: 0xFFB6C1, emissive: 0xFF69B4, emissiveIntensity: 0.3,
       metalness: 0.1, roughness: 0.3,
     });
 
-    // === 1. Earthen Mound ===
-    const mound = new THREE.Mesh(
-      new THREE.CylinderGeometry(18, 20, 2, 32),
-      earthMat,
-    );
-    mound.position.set(0, 1, 0);
-    mound.receiveShadow = true;
-    group.add(mound);
-
-    const moundBody = new CANNON.Body({
-      mass: 0,
-      shape: new CANNON.Box(new CANNON.Vec3(18, 1, 18)),
-      position: new CANNON.Vec3(px, py + 1, pz),
-    });
-    this.engine.addPhysicsBody(moundBody);
-    this.bodies.push(moundBody);
-
     // === 2. Moat Water Ring ===
     const moat = new THREE.Mesh(
       new THREE.RingGeometry(15, 19, 32),
       waterMat,
     );
-    moat.position.set(0, 0.05, 0);
+    moat.position.set(0, -0.05, 0);
     moat.rotation.x = -Math.PI / 2;
     group.add(moat);
 

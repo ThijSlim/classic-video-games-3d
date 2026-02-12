@@ -94,7 +94,7 @@ export class Mario extends GameObject {
     this.body = new CANNON.Body({
       mass: 1,
       shape,
-      position: new CANNON.Vec3(0, 5, 0),
+      position: new CANNON.Vec3(0, 5, 12),
       fixedRotation: true,
       linearDamping: 0.1,
     });
@@ -448,7 +448,7 @@ export class Mario extends GameObject {
   }
 
   respawn(): void {
-    this.body.position.set(0, 5, 0);
+    this.body.position.set(0, 5, 12);
     this.body.velocity.set(0, 0, 0);
     this.isGrounded = false;
     this.state = MarioState.Falling;
