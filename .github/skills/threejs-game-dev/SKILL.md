@@ -404,3 +404,52 @@ Distant terrain features (mountains, slopes) should be:
 - **Large scale:** Radii of 30-50 units, heights of 20-35 units
 - **Muted colors:** Slightly lighter/bluer greens for atmospheric perspective (`0x66BB6A`, `0x81C784`, `0x90CAF9`)
 - **Partially buried:** Set Y position to half-height so the base is at ground level
+
+### cannon-es Euler Rotation API (Added 2026-03-02)
+canon-es `Body.quaternion` has `setFromEuler(x, y, z)` — NOT `setFromEulerAngles`. Use it for data-driven multi-axis rotations (e.g., curved path segments):
+```typescript
+// Match mesh.rotation.y on the physics body
+body.quaternion.setFromEuler(0, seg.rotY, 0);
+```
+For single-axis rotation, `setFromAxisAngle` is equally valid:
+```typescript
+body.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), seg.rotY);
+```
+**Pitfall:** `setFromEulerAngles` does NOT exist in cannon-es. This is a common hallucination in AI-generated code.
+
+### Transparent Water Surfaces (Added 2026-03-02)
+For ponds and water features, use `MeshStandardMaterial` with transparency for a more realistic look than `MeshBasicMaterial`:
+```typescript
+const pondWaterMat = new THREE.MeshStandardMaterial({
+  color: 0x2196F3,
+  roughness: 0.3,    // Low roughness = reflective
+  metalness: 0.1,
+  transparent: true,
+  opacity: 0.7,
+});
+```
+**Tip:** Use `roughness: 0.3` and `metalness: 0.1` to get subtle reflections on the water surface. Lower opacity (0.5-0.7) lets the basin beneath show through.
+
+### Open-Ended Cylinder with DoubleSide for Basin Walls (Added 2026-03-02)
+When creating a sunken basin (pond, pit), use a slightly tapered open-ended cylinder with `DoubleSide` so the walls are visible from both inside and outside:
+```typescript
+const basinWall = new THREE.Mesh(
+  new THREE.CylinderGeometry(11, 9, 3, 32, 1, true), // tapered: wider at top
+  new THREE.MeshStandardMaterial({ color: 0x5D4037, side: THREE.DoubleSide }),
+);
+```
+The taper (11 top → 9 bottom) gives a natural slope to the basin walls.
+
+### Invisible Physics Walls (Added 2026-03-02)
+For complex visual geometry that would be unreliable as physics shapes (e.g., rotated cliff boxes, cone peaks), create separate invisible `CANNON.Body` instances with simple shapes:
+```typescript
+// No visual mesh — just a physics barrier
+const body = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Box(new CANNON.Vec3(14, 6, 18)),
+  position: new CANNON.Vec3(-45, 6, -35),
+});
+engine.addPhysicsBody(body);
+```
+**When to use:** Visual geometry uses rotations, cones, or complex arrangements that would produce unpredictable physics collision. The invisible walls provide clean, reliable barriers.
+**Design principle:** Visual fidelity and physics reliability serve different goals. Don't try to make one shape serve both unless it's simple (box, sphere).

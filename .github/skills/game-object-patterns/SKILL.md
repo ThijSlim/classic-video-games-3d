@@ -283,9 +283,22 @@ for (const pos of positions) {
 
 Decorative objects (trees, pipes) are added directly to the scene without being tracked as entities.
 
-### Terrain Building (Added 2026-02-12)
+### Terrain Building (Added 2026-02-12, Updated 2026-03-02)
 
 World.ts builds terrain via a dedicated `buildTerrain()` method. Terrain elements are added directly to the scene (not tracked as entities) since they're static and don't need `update()` calls.
+
+The Castle Grounds terrain is organized into named zones (A–I), each with a distinct terrain type and construction technique.
+
+#### Zone Architecture (Castle Grounds)
+| Zone | Name | Technique | Location |
+|------|------|-----------|----------|
+| A | Sandy Path | Overlapping rotated boxes | SW to SE, L-shaped curve |
+| B | Main Hill | 10 concentric scaled cylinders | Center-left (-15, -5) |
+| E | Pond | Sunken cylinder meshes + transparent water | SE corner (25, 15) |
+| F | Stone Platform | Platform class reuse | East (18, 12) |
+| G | Rocky Cliff | 5 boxes + 2 cones + invisible walls | West boundary (-45, -35) |
+| H | Left Hill | 5 concentric scaled cylinders | Northwest (-20, -35) |
+| I | Right Hill | 5 concentric scaled cylinders | Northeast (25, -35) |
 
 #### Concentric Cylinder Mound / Hill
 Approximate a dome/hill with stacked `CylinderGeometry` layers of decreasing radius. Used for both platform mounds and prominent foreground hills:
@@ -323,23 +336,145 @@ for (const layer of hillLayers) {
 **When to use:** Castle mounds, foreground hills, or any terrain that needs a rounded elevated shape with walkable physics.
 **Design tip:** More layers with smaller radius steps = smoother curve. 6 layers for a gentle mound, 10 for a prominent hill.
 
-#### Elliptical Hill via Scale
-Stretch a cylinder on one axis to create an elongated hill. Physics uses `CANNON.Box` with scaled half-extents since `CANNON.Cylinder` doesn't support non-uniform scale:
+#### Elongated Hill via XZ Scale (Added 2026-03-02)
+Stretch a cylinder on **both** X and Z axes with different scale values to create non-circular, elongated hill footprints. Physics uses `CANNON.Box` with scaled half-extents since `CANNON.Cylinder` doesn't support non-uniform scale:
 ```typescript
+const layer = { radius: 20, y: 0.4, height: 0.8, scaleX: 1.25, scaleZ: 1.50 };
 const mesh = new THREE.Mesh(
-  new THREE.CylinderGeometry(radius, radius, height, 24),
-  greenMat,
+  new THREE.CylinderGeometry(layer.radius, layer.radius, layer.height, 32),
+  grassMat,
 );
-mesh.position.set(x, y, z);
-mesh.scale.x = 1.5; // Stretch for elliptical shape
+mesh.position.set(hillCenter.x, layer.y, hillCenter.z);
+mesh.scale.x = layer.scaleX;
+mesh.scale.z = layer.scaleZ;
+mesh.receiveShadow = true;
+engine.addToScene(mesh);
 
+// CANNON.Box approximation since CANNON.Cylinder can't scale non-uniformly
 const body = new CANNON.Body({
   mass: 0,
-  shape: new CANNON.Box(new CANNON.Vec3(radius * 1.5, height / 2, radius)),
-  position: new CANNON.Vec3(x, y, z),
+  shape: new CANNON.Box(new CANNON.Vec3(
+    layer.radius * layer.scaleX,
+    layer.height / 2,
+    layer.radius * layer.scaleZ,
+  )),
+  position: new CANNON.Vec3(hillCenter.x, layer.y, hillCenter.z),
 });
+engine.addPhysicsBody(body);
 ```
-**Tip:** Scale `.x` for east-west stretch, `.z` for north-south stretch.
+**When to use:** Hills that should appear elongated rather than circular (e.g., ridgelines, terrain that follows a natural slope).
+**Tip:** Scale `.x` for east-west stretch, `.z` for north-south stretch. Decrease scale values toward the peak for a natural taper.
+
+#### Curved Path via Overlapping Rotated Boxes (Added 2026-03-02)
+Create a smooth curved road by overlapping multiple slightly rotated flat boxes:
+```typescript
+const sandPathSegments = [
+  { pos: [-18, -0.1, 22], size: [12, 0.3, 10], rotY: 0 },
+  { pos: [-12, -0.1, 17], size: [10, 0.3, 8],  rotY: Math.PI / 6 },
+  { pos: [-4,  -0.1, 14], size: [14, 0.3, 8],  rotY: Math.PI / 10 },
+  { pos: [6,   -0.1, 12], size: [12, 0.3, 9],  rotY: 0 },
+  // More segments to continue the curve...
+];
+
+for (const seg of sandPathSegments) {
+  const mesh = new THREE.Mesh(
+    new THREE.BoxGeometry(seg.size[0], seg.size[1], seg.size[2]),
+    sandPathMat,
+  );
+  mesh.position.set(seg.pos[0], seg.pos[1], seg.pos[2]);
+  mesh.rotation.y = seg.rotY;
+  mesh.receiveShadow = true;
+  engine.addToScene(mesh);
+
+  const body = new CANNON.Body({
+    mass: 0,
+    shape: new CANNON.Box(new CANNON.Vec3(seg.size[0]/2, seg.size[1]/2, seg.size[2]/2)),
+    position: new CANNON.Vec3(seg.pos[0], seg.pos[1], seg.pos[2]),
+  });
+  body.quaternion.setFromEuler(0, seg.rotY, 0);  // Match mesh rotation
+  engine.addPhysicsBody(body);
+}
+```
+**Key technique:** Use `body.quaternion.setFromEuler(x, y, z)` to match physics rotation to mesh rotation. This is the cannon-es equivalent of Euler angles.
+**When to use:** Roads, sandy paths, rivers — any feature that curves organically across the terrain.
+**Tip:** Overlap segments so there are no visible gaps. Vary segment widths for a natural look.
+
+#### Water Body / Pond (Added 2026-03-02)
+Create a sunken pond with transparent water surface, visible basin walls, and floor:
+```typescript
+// Transparent water surface
+const waterSurface = new THREE.Mesh(
+  new THREE.CylinderGeometry(10, 10, 0.1, 32),
+  new THREE.MeshStandardMaterial({
+    color: 0x2196F3, roughness: 0.3, metalness: 0.1,
+    transparent: true, opacity: 0.7,
+  }),
+);
+waterSurface.position.set(25, -0.5, 15);
+waterSurface.scale.set(1.0, 1, 0.75);  // Elliptical shape
+engine.addToScene(waterSurface);
+
+// Open-ended cylinder for visible basin walls
+const basinWall = new THREE.Mesh(
+  new THREE.CylinderGeometry(11, 9, 3, 32, 1, true),  // true = open-ended
+  new THREE.MeshStandardMaterial({ color: 0x5D4037, roughness: 0.95, side: THREE.DoubleSide }),
+);
+basinWall.position.set(25, -1.75, 15);
+engine.addToScene(basinWall);
+
+// Pond floor physics (prevents falling through)
+const pondFloorBody = new CANNON.Body({
+  mass: 0,
+  shape: new CANNON.Box(new CANNON.Vec3(10, 0.1, 7.5)),
+  position: new CANNON.Vec3(25, -3, 15),
+});
+engine.addPhysicsBody(pondFloorBody);
+```
+**Key techniques:**
+- Open-ended cylinder (`true` param) with `DoubleSide` material for visible basin walls
+- Slightly tapered basin (r=11 top, r=9 bottom) for natural slope
+- Grass lip ring around the pond for smooth ground-to-water transition
+**When to use:** Ponds, lakes, swimming holes — any contained water body.
+
+#### Rocky Cliff with Invisible Physics Walls (Added 2026-03-02)
+Build rugged cliffs from overlapping rotated boxes and cones, then add invisible `CANNON.Box` walls for collision:
+```typescript
+// Visual: rotated boxes for cliff face
+const cliffBoxes = [
+  { pos: [-45, 3, -35],  size: [25, 6, 35],  rot: [0, 0.15, 0] },
+  { pos: [-47, 9, -38],  size: [18, 6, 28],  rot: [0, -0.1, 0] },
+  // More layers for height...
+];
+for (const box of cliffBoxes) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...box.size), rockMat);
+  mesh.position.set(...box.pos);
+  mesh.rotation.set(...box.rot);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  engine.addToScene(mesh);
+}
+
+// Visual: cone peaks at the top
+const cliffPeaks = [
+  { pos: [-50, 19, -42], radius: 6, height: 10, segments: 5, rot: [0, 0, 0.15] },
+];
+
+// Invisible physics walls — no visual mesh, just CANNON bodies
+const cliffWalls = [
+  { pos: [-45, 6, -35],  halfExtents: [14, 6, 18] },
+  { pos: [-47, 14, -38], halfExtents: [10, 6, 15] },
+];
+for (const wall of cliffWalls) {
+  const body = new CANNON.Body({
+    mass: 0,
+    shape: new CANNON.Box(new CANNON.Vec3(...wall.halfExtents)),
+    position: new CANNON.Vec3(...wall.pos),
+  });
+  engine.addPhysicsBody(body);
+}
+```
+**Key technique:** Separate visual meshes (detailed, rotated for ruggedness) from physics bodies (simple axis-aligned boxes for reliable collision). The player collides with the invisible walls, not the visual meshes.
+**When to use:** Cliffs, canyon walls, irregular rock formations — anywhere the visual shape is too complex for reliable physics collision.
 
 #### Rotated Ramp with Physics
 Both the mesh and physics body must rotate by the same angle:

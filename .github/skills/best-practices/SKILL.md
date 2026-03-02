@@ -299,5 +299,62 @@ When surrounding terrain features change size, connectors (bridges, ramps, walkw
 ### Terrain Building Method Organization
 Keep terrain construction in a dedicated `buildTerrain()` method called from `buildLevel()`. This separates terrain from gameplay objects (platforms, coins, enemies) and keeps `buildLevel()` readable.
 
-*Last updated: 2026-02-12*
-*Updated by: learning agent — Terrain overhaul: foreground hill depth, excavated moat/trench, courtyard disc, catch bodies, object relocation protocol, open-ended cylinders*
+---
+
+## Terrain Map Implementation (Added 2026-03-02)
+
+### cannon-es Quaternion API: `setFromEuler` vs `setFromAxisAngle`
+canon-es provides **two different methods** for setting body rotation:
+- `body.quaternion.setFromEuler(x, y, z)` — Sets rotation from Euler angles (all three axes at once). Best for matching `mesh.rotation.set(x, y, z)` or when you have data-driven rotY values.
+- `body.quaternion.setFromAxisAngle(axis, angle)` — Sets rotation around a single axis. Best for single-axis rotations like ramps.
+
+**WARNING:** There is NO `setFromEulerAngles` method in cannon-es. If you see this in documentation or AI-generated code, it's wrong. The correct method is `setFromEuler(x, y, z)`.
+
+```typescript
+// For Y-axis rotation (paths, roads):
+body.quaternion.setFromEuler(0, rotY, 0);
+
+// For single-axis rotation (ramps):
+body.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -0.12);
+```
+
+### Inline Terrain Pattern vs Class-Based
+Terrain built via `buildTerrain()` uses **inline construction** (direct mesh + body creation) rather than creating `GameObject` subclasses. This is the correct choice when:
+- The terrain is static (no `update()` needed)
+- No entity tracking required (no collision checks against terrain zones)
+- Many small pieces compose a single feature (e.g., 10 cylinder layers for one hill)
+- No reuse across files (terrain is World-specific)
+
+**Use class-based `GameObject`** when:
+- The object needs per-frame updates (enemies, collectibles)
+- Object lifecycle management is needed (destroy, respawn)
+- The object needs collision detection in the World update loop
+- Reuse across different levels/worlds
+
+**Exception:** The Stone Platform (Zone F) uses `Platform` class because it's a distinct gameplay surface that benefits from entity tracking. This is a good example of mixing both patterns in the same level.
+
+### CANNON.Box for Scaled Cylinder Physics
+When using `mesh.scale.x`/`mesh.scale.z` on CylinderGeometry to create elongated shapes, always use `CANNON.Box` (not `CANNON.Cylinder`) for the physics body:
+- `CANNON.Cylinder` doesn't support non-uniform scaling
+- `CANNON.Box` with scaled half-extents provides more predictable collision behavior for large terrain features
+- The player won't notice the box-vs-cylinder difference on terrain hills
+
+### Terrain Zone Organization
+Organize complex terrain into named zones (A, B, C...) with comments separating each zone in the code. This makes the terrain map navigable and debuggable:
+```typescript
+// === Sandy Path (Zone A) — L-shaped curve from SW to SE ===
+// ... zone A code ...
+
+// === Main Hill (Zone B) — Elongated, center-left ===
+// ... zone B code ...
+```
+Maintain a companion architecture document ([castle-grounds-terrain-map.md](../../architecture-analysis/castle-grounds-terrain-map.md)) that maps zones to game coordinates.
+
+### Spawn Point Alignment with Terrain
+When restructuring terrain, update the player spawn/respawn position to match the new layout:
+- Spawn should be on walkable terrain (not inside a hill or over a cliff)
+- Spawn Y should be above the terrain surface (e.g., y=5 if ground is at y=0)
+- Test that the player lands cleanly on the ground after spawning
+
+*Last updated: 2026-03-02*
+*Updated by: learning agent — Castle Grounds terrain map: setFromEuler API, inline terrain pattern, CANNON.Box for scaled cylinders, zone organization, spawn alignment*
