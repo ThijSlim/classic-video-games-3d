@@ -2,7 +2,7 @@
 name: bug-triager
 description: Triages game bug reports — reproduces symptoms, classifies the bug category, narrows down affected systems, and produces a structured investigation brief for deeper analysis.
 tools: ["read", "search", "execute"]
-user-invokable: false
+user-invocable: false
 ---
 
 # Bug Triager

@@ -1,8 +1,8 @@
 ---
 name: architect-analyst
 description: Analyzes images of buildings, structures, and terrain like a technical architect — captures structural elements, dimensions, proportions, angles, materials, construction methods, spatial relationships, and landscape/terrain characteristics with professional architectural precision.
-tools: ["read", "search", "web", "edit"]
-user-invokable: true
+tools: ["read", "search", "web", "edit", "agent"]
+user-invocable: true
 ---
 
 # Technical Architect Analyst
