@@ -40,33 +40,33 @@ The following ASCII map represents the castle grounds from directly above. North
 | `☆` | Mario start position |
 | `□` | Stone platform |
 
-### Full Terrain Map
+### Full Terrain Map (v2)
 
 ```
         N (into screen / -Z in game)
         ↑
-                                                    
-  ▲  ▲  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ▲  ▲  ▲  ·  ·  ●  ●  ♣  ·  ·  ·  ·  ·  ♣  ○  ○  ●  ●  ·  ·  ·
-  ▲  ▲  ·  ·  ○  ●  ♣  ·  ≈  ≈  ≈  ≈  ≈  ·  ·  ○  ●  ♣  ●  ·  ·
-  ▲  ·  ·  ○  ●  ♣  ·  ≈  ≈  ▓  ▓  ▓  ≈  ≈  ·  ♣  ●  ●  ♣  ·  ·
-  ·  ·  ·  ○  ●  ·  ·  ≈  ▓  ▓  ▓  ▓  ▓  ≈  ·  ·  ○  ●  ♣  ·  ·
-  ·  ░  ░  ○  ●  ♣  ·  ≈  ▓  ▓  ▓  ▓  ▓  ≈  ·  ·  ○  ♣  ○  ·  ·
-  ░  ░  ░  ○  ○  ♣  ·  ≈  ≈  ▓  ▓  ▓  ≈  ≈  ·  ·  ○  ○  ♣  ·  ·
-  ░  ░  ░  ○  ●  ○  ·  ·  ≈  ≈  ═══  ≈  ≈  ·  ·  ○  ·  ·  ·  ·
-  ░  ░  ░  ○  ●  ●  ○  ·  ·  ·  ║  ·  ·  ·  ·  ░  ░  ░  ░  ·  ·
-  ░  ░  ░  ○  ●  ●  ♣  ○  ·  ·  ║  ·  ·  ·  ░  ░  ░  ░  ░  ·  ·
-  ░  ░  ○  ●  ●  ♣  ●  ○  ·  ·  ·  ·  ·  ░  ░  ░  ░  ░  ·  ·  ·
-  ░  ░  ○  ●  ♣  ●  ●  ·  ·  ·  ·  ·  ░  ░  ░  ░  ░  ░  ░  ·  ·
-  ░  ░  ○  ♣  ●  ●  ♣  ○  ·  ·  ·  ░  ░  ░  ·  ·  ·  ░  ░  ·  ·
-  ░  ░  ○  ○  ●  ♣  ○  ·  ·  ·  ░  ░  ░  ·  ·  ≈  ≈  ░  ░  ·  ·
-  ·  ░  ░  ○  ○  ○  ♣  ·  ·  ░  ░  ░  ·  ·  ≈  ≈  ≈  ≈  ░  ·  ·
-  ·  ░  ░  ░  ░  ·  ·  ·  ░  ░  ░  ░  ·  ·  ≈  ≈  ≈  ≈  ·  ·  ·
-  ·  ·  ░  ░  ░  ░  ░  ░  ░  ░  ░  ·  ·  □  ≈  ≈  ≈  ░  ░  ·  ·
-  ·  ·  ·  ░  ░  ░  ░  ░  ░  ░  ·  ·  ·  □  □  ░  ░  ░  ░  ·  ·
-  ·  ·  ·  ·  ░  ░  ░  ░  ░  ·  ·  ·  ·  ·  ░  ░  ░  ░  ·  ·  ·
-  ·  ·  ·  ·  ·  ░  ░  ☆  ░  ·  ·  ·  ·  ·  ░  ░  ░  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·  ░  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+             
+  ▲  ·  ·  ○  ●  ♣  ·  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ≈  ≈  ░  ●  ●  ♣  ·  ·
+  ·  ·  ·  ○  ●  ·  ·  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ░ ░ ░ ░  ○  ●  ♣  ·  ·
+  ·  ·  ·  ○  ●  ░  ░  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ≈  ≈  ░  ○  ♣  ○  ·  ·
+  ▲  ·  ·  ○  ●  ♣  ·  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ≈  ≈  ░  ●  ●  ♣  ·  ·
+  ·  ·  ·  ○  ●  ·  ·  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ≈  ≈  ░  ○  ●  ♣  ·  ·
+  ·  ·  ·  ○  ●  ░  ░  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ≈  ≈  ░  ○  ♣  ○  ·  ·
+  ·  ·  ·  ○  ○  ♣  ░  ≈  ≈  ≈  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ▓  ≈  ≈  ≈  ░  ○  ○  ♣  ·  ·
+  ·  ·  ·  ○  ●  ○  ░  ░  ≈  ≈  ≈  ≈  ≈  ════  ≈  ≈  ≈  ≈  ≈  ·  ░  ·  ·  ·  ·  ·
+  ·  ·  ·  ○  ●  ●  ○  ░  ░  ≈  ≈  ≈  ≈  ════  ≈  ≈  ≈  ≈  ░  ░  ░  ░  ░  ░  ·  ·
+  ·  ·  ·  ○  ●  ●  ♣  ○  ░  ░  ≈  ≈  ≈  ════  ≈  ≈  ≈  ░  ░  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ○  ●  ●  ♣  ●  ○  ·  ░  ░  ░  ░  ░  ░  ░  ░  ░  ░  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ○  ●  ♣  ●  ●  ·  ░  ░  ░  ░  ░  ░  ░  ░  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ○  ♣  ●  ●  ♣  ○  ░  ░  ·  ·  ░  ░  ░  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ○  ○  ●  ♣  ○  ░  ░  ·  ·  ○  ○  ♣  ○  ·  ·  ·  ·  ≈  ≈  ≈  ≈  ░  ░  ·  ·
+  ·  ·  ·  ○  ○  ○  ♣  ░  ░  ·  ○  ●  ♣  ○  ○  ·  ·  ·  ≈  ≈  ≈  ≈  ≈  ≈  ░  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ░  ░  ░  ○  ○  ♣  ○  ○  ·  ·  ·  ≈  ≈  ≈  ≈  ≈  ≈  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ░  ░  ░  ○  ♣  ░  ░  ·  ·  □  ≈  ≈  ≈  ≈  ≈  ░  ░  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ░  ░  ░  ░  ░  ░  ·  ·  □  □  ░  ░  ░  ░  ░  ░  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ░  ░  ░  ░  ░  ·  ·  ·  ·  ░  ░  ░  ░  ░  ░  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ░  ░  ·  ·  ·  ·  ·  ░  ░  ░  ░  ░  ·  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
 
         ↓
         S (toward camera / +Z in game)
@@ -78,7 +78,21 @@ The following ASCII map represents the castle grounds from directly above. North
 | `□` | Stone platform |
 | `▲` | Rocky cliff / mountain edge |
 
-**Confidence: High** (general layout matches reference image)
+**Version 2 Changes:**
+- Castle width doubled (from ~5 to ~10 tiles)
+- Moat/water around castle doubled in width
+- Sand path connects from Mario start to bridge
+- West side is now only grass (no sand)
+- South of bridge: 3 sand rows → 3 grass rows → 3 sand rows
+
+**Confidence: High** (updated layout per iteration feedback
+- Castle width doubled (from ~5 to ~10 tiles)
+- Moat/water around castle doubled in width
+- Sand path connects from Mario start to bridge
+- West side is now only grass (no sand)
+- South of bridge: 3 sand rows → 3 grass rows → 3 sand rows
+
+**Confidence: High** (updated layout per iteration feedback)
 
 ---
 
@@ -401,26 +415,27 @@ ELEVATION KEY:
               N
               ↑
 
-  ■  ■  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ■  ■  ■  ·  ·  ░  ▒  ·  ·  ·  ·  ·  ·  ·  ░  ▒  ▓  ▒  ·  ·  ·
-  ■  ■  ·  ·  ░  ▒  ·  ·  ≈  ≈  ≈  ≈  ≈  ·  ·  ░  ▒  ▓  ▒  ·  ·
-  ■  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  ≈  ≈  ·  ·  ░  ▒  ▒  ·  ·
-  ·  ·  ·  ░  ▒  ·  ·  ≈  █  █  █  █  █  ≈  ·  ·  ░  ▒  ·  ·  ·
-  ·  ·  ·  ░  ▒  ·  ·  ≈  █  █  █  █  █  ≈  ·  ·  ░  ░  ·  ·  ·
-  ·  ·  ·  ░  ░  ·  ·  ≈  ≈  █  █  █  ≈  ≈  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ░  ▒  ░  ·  ·  ≈  ≈  ═  ≈  ≈  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ░  ▒  ▒  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ░  ▒  ▒  ▒  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ░  ▒  ▒  ▓  ▒  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ░  ▒  ▓  ▓  ▒  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ░  ▒  ▓  ▒  ▒  ░  ·  ·  ·  ·  ·  ·  ·  ·  ≈  ≈  ·  ·  ·
-  ·  ·  ░  ░  ▒  ▒  ░  ·  ·  ·  ·  ·  ·  ·  ≈  ≈  ≈  ≈  ·  ·  ·
-  ·  ·  ·  ░  ░  ░  ·  ·  ·  ·  ·  ·  ·  □  ≈  ≈  ≈  ≈  ·  ·  ·
-  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  □  □  ≈  ≈  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
-  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ■  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  █  █  █  █  █  █  █  ≈  ≈  ·  ▒  ▒  ·  ·  ·
+  ·  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  █  █  █  █  █  █  █  ·  ·  ·  ░  ▒  ·  ·  ·
+  ·  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  █  █  █  █  █  █  █  ≈  ≈  ·  ░  ·  ░  ·  ·
+  ■  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  █  █  █  █  █  █  █  ≈  ≈  ·  ▒  ▒  ·  ·  ·
+  ·  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  █  █  █  █  █  █  █  ≈  ≈  ·  ░  ▒  ·  ·  ·
+  ·  ·  ·  ░  ▒  ·  ·  ≈  ≈  █  █  █  █  █  █  █  █  █  █  ≈  ≈  ·  ░  ·  ░  ·  ·
+  ·  ·  ·  ░  ░  ·  ·  ≈  ≈  ≈  █  █  █  █  █  █  █  █  ≈  ≈  ≈  ·  ░  ░  ·  ·  ·
+  ·  ·  ·  ░  ▒  ░  ·  ·  ≈  ≈  ≈  ≈  ≈  ═══  ≈  ≈  ≈  ≈  ≈  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ·  ░  ▒  ▒  ░  ·  ·  ≈  ≈  ≈  ≈  ═══  ≈  ≈  ≈  ≈  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ·  ░  ▒  ▒  ·  ░  ·  ·  ≈  ≈  ≈  ═══  ≈  ≈  ≈  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ░  ▒  ▒  ·  ▒  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ░  ▒  ·  ▒  ▒  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ░  ·  ▒  ▒  ·  ░  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ░  ░  ▒  ·  ░  ·  ·  ·  ·  ░  ░  ·  ░  ·  ·  ·  ·  ≈  ≈  ≈  ≈  ·  ·  ·  ·
+  ·  ·  ·  ░  ░  ░  ·  ·  ·  ·  ░  ▒  ·  ░  ░  ·  ·  ·  ≈  ≈  ≈  ≈  ≈  ≈  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ░  ░  ·  ░  ░  ·  ·  ·  ≈  ≈  ≈  ≈  ≈  ≈  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ░  ·  ·  ·  ·  ·  □  ≈  ≈  ≈  ≈  ≈  ·  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  □  □  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·
 
               ↓
               S
@@ -557,30 +572,32 @@ MATERIAL KEY:
               N (-Z)
               ↑
 
-  R  R  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B
-  R  R  R  B  g  g  g  B  B  B  B  B  B  g  g  g  g  g  B  B
-  R  R  B  B  g  g  B  W  W  W  W  W  B  B  g  g  g  g  B  B
-  R  B  B  g  g  B  B  W  W  K  K  K  W  W  B  g  g  g  g  B
-  B  B  B  g  g  B  B  W  K  K  K  K  K  W  B  B  g  g  g  B
-  B  S  S  g  g  B  B  W  K  K  K  K  K  W  B  B  g  g  g  B
-  S  S  S  g  g  B  B  W  W  K  K  K  W  W  B  B  g  g  g  B
-  S  S  S  g  g  g  B  B  W  W  T  W  W  B  B  g  B  B  B  B
-  S  S  S  g  g  g  g  B  B  B  B  B  B  B  B  S  S  S  S  B
-  S  S  S  g  g  g  g  g  B  B  B  B  B  S  S  S  S  S  S  B
-  S  S  g  g  g  g  g  g  B  B  B  B  S  S  S  S  S  S  B  B
-  S  S  g  g  g  g  g  B  B  B  B  B  S  S  S  S  S  S  S  B
-  S  S  g  g  g  g  g  g  B  B  B  S  S  S  B  B  B  S  S  B
-  S  S  g  g  g  g  g  B  B  B  S  S  S  B  W  W  W  S  S  B
-  B  S  S  g  g  g  g  B  B  S  S  S  B  P  W  W  W  W  S  B
-  B  S  S  S  S  B  B  B  S  S  S  S  B  P  P  W  W  S  S  B
-  B  B  S  S  S  S  S  S  S  S  S  B  B  B  S  S  S  S  S  B
-  B  B  B  S  S  S  S  S  S  S  B  B  B  B  B  S  S  S  B  B
-  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B
+  R  B  B  g  g  B  B  W  W  K  K  K  K  K  K  K  K  K  K  W  W  S  g  g  B  B  B
+  B  B  B  g  g  B  B  W  W  K  K  K  K  K  K  K  K  K  K  S  S  S  g  g  B  B  B
+  B  B  B  g  g  S  S  W  W  K  K  K  K  K  K  K  K  K  K  W  W  S  g  B  g  B  B
+  R  B  B  g  g  B  B  W  W  K  K  K  K  K  K  K  K  K  K  W  W  S  g  g  B  B  B
+  B  B  B  g  g  B  B  W  W  K  K  K  K  K  K  K  K  K  K  W  W  S  g  g  B  B  B
+  B  B  B  g  g  S  S  W  W  K  K  K  K  K  K  K  K  K  K  W  W  S  g  B  g  B  B
+  B  B  B  g  g  B  S  W  W  W  K  K  K  K  K  K  K  K  W  W  W  S  g  g  B  B  B
+  B  B  B  g  g  g  S  S  W  W  W  W  W  T  T  W  W  W  W  B  S  B  B  B  B  B  B
+  B  B  B  g  g  g  g  S  S  W  W  W  W  T  T  W  W  W  S  S  S  S  S  S  B  B  B
+  B  B  B  g  g  g  B  g  S  S  W  W  W  T  T  W  W  S  S  B  B  B  B  B  B  B  B
+  B  B  g  g  g  B  g  g  B  S  S  S  S  S  S  S  S  S  S  B  B  B  B  B  B  B  B
+  B  B  g  g  B  g  g  B  S  S  S  S  S  S  S  S  S  B  B  B  B  B  B  B  B  B  B
+  B  B  g  B  g  g  B  g  S  S  B  B  S  S  S  S  B  B  B  B  B  B  B  B  B  B  B
+  B  B  g  g  g  B  g  S  S  B  B  g  g  B  g  B  B  B  B  W  W  W  W  S  S  B  B
+  B  B  B  g  g  g  B  S  S  B  g  g  B  g  g  B  B  B  W  W  W  W  W  W  S  B  B
+  B  B  B  B  B  B  B  S  S  S  g  g  B  g  g  B  B  B  W  W  W  W  W  W  B  B  B
+  B  B  B  B  B  B  B  B  S  S  S  g  B  S  S  B  B  P  W  W  W  W  W  S  S  B  B
+  B  B  B  B  B  B  B  B  B  S  S  S  S  S  S  B  B  P  P  S  S  S  S  S  S  B  B
+  B  B  B  B  B  B  B  B  B  S  S  S  S  S  B  B  B  B  S  S  S  S  S  S  B  B  B
+  B  B  B  B  B  B  B  B  B  B  B  S  S  B  B  B  B  B  S  S  S  S  S  B  B  B  B
+  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B  B
 
               ↓
               S (+Z)
               
-  Legend: R=Rocky cliff | S=Sand path | g=Grass hills | W=Water | K=Castle | P=Platform
+  Legend: R=Rocky cliff | S=Sand path | g=Grass hills | W=Water | K=Castle | P=Platform | T=Bridge
 ```
 
 ---
